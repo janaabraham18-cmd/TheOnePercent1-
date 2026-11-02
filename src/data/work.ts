@@ -1,4 +1,5 @@
 import type { ImageMetadata } from 'astro';
+import type { LogoId } from '../components/ClientLogo.astro';
 
 import ssCover from '../assets/work/gallery-walking-deadvlei.jpg';
 import ssStars from '../assets/work/gallery-stars-over-the-namib.jpg';
@@ -27,6 +28,9 @@ export type Project = {
   brief: string;
   built: { title: string; body: string }[];
   details: string[];
+  /** Client logo shown in place of a photo on the home page and case study. */
+  logo: LogoId;
+  /** Used for the social-share image only. */
   cover: Photo;
   gallery: Photo[];
 };
@@ -71,6 +75,7 @@ export const projects: Project[] = [
       'One hand-picked word in every heading is set in the brand’s accent colour.',
       'A plain-text summary file helps AI assistants describe the business accurately.',
     ],
+    logo: 'salt-and-sun',
     cover: { src: ssCover, alt: 'A traveller walking across the white clay pan of Deadvlei, with red dunes behind' },
     gallery: [
       { src: ssStars, alt: 'The Milky Way over a quiver tree in the Namib Desert' },
@@ -116,6 +121,7 @@ export const projects: Project[] = [
       'The header wordmark stacks the full name so it fits the navigation on every screen size.',
       'Checked at six widths, from a phone to a TV, with no sideways scrolling on any page.',
     ],
+    logo: 'springtide',
     cover: { src: stCover, alt: 'The main trampoline court at Springtide Adventure Park' },
     gallery: [
       { src: stWall, alt: 'The climbing wall above the foam pit' },

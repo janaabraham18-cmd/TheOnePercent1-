@@ -1,0 +1,145 @@
+---
+// Hero wordmark: starts as "TOP" and stretches out into "TheOnePercent",
+// then the "1%" block lands. Without JS, or with reduced motion, it simply
+// shows the full name.
+import { site } from '../data/site';
+
+const words = [
+  ['T', 'he'],
+  ['O', 'ne'],
+  ['P', 'ercent'],
+];
+---
+
+<div class="kw" role="img" aria-label={site.name} data-kw>
+  <span class="kw__name" aria-hidden="true">
+    {words.map(([cap, rest]) => (
+      <span class="kw__word"><span class="kw__cap">{cap}</span><span class="kw__rest" data-kw-rest>{rest}</span></span>
+    ))}
+  </span><span class="kw__mark" aria-hidden="true" data-kw-mark>{site.nameMark}</span>
+</div>
+
+<script>
+  const root = document.querySelector<HTMLElement>('[data-kw]');
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (root && !reduce && 'animate' in root) {
+    const rests = [...root.querySelectorAll<HTMLElement>('[data-kw-rest]')];
+    const mark = root.querySelector<HTMLElement>('[data-kw-mark]')!;
+    const ease = 'cubic-bezier(0.65, 0, 0.35, 1)';
+    let running = false;
+
+    const collapse = () => {
+      rests.forEach((r) => {
+        r.style.maxWidth = '0px';
+        r.style.opacity = '0';
+      });
+      mark.style.opacity = '0';
+      mark.style.transform = 'translateY(0.25em) scale(0.6)';
+    };
+
+    const expand = async (delay: number) => {
+      running = true;
+      const anims = rests.map((r, i) => {
+        // Measure the natural width of the hidden letters, then grow into it.
+        r.style.maxWidth = 'none';
+        const w = r.scrollWidth;
+        r.style.maxWidth = '0px';
+        return r.animate(
+          [
+            { maxWidth: '0px', opacity: 0 },
+            { maxWidth: `${w}px`, opacity: 1 },
+          ],
+          { duration: 900, delay: delay + i * 140, easing: ease, fill: 'forwards' },
+        );
+      });
+      await Promise.all(anims.map((a) => a.finished));
+      rests.forEach((r, i) => {
+        anims[i].cancel();
+        r.style.maxWidth = '';
+        r.style.opacity = '';
+      });
+      const m = mark.animate(
+        [
+          { opacity: 0, transform: 'translateY(0.25em) scale(0.6)' },
+          { opacity: 1, transform: 'none' },
+        ],
+        { duration: 520, easing: 'cubic-bezier(0.34, 1.56, 0.64, 1)', fill: 'forwards' },
+      );
+      await m.finished;
+      m.cancel();
+      mark.style.opacity = '';
+      mark.style.transform = '';
+      running = false;
+    };
+
+    collapse();
+    root.classList.add('is-ready');
+    // Hold on "TOP" for a beat so it reads before it stretches.
+    void expand(900);
+
+    // Replay on hover (mouse only), once the first run has finished.
+    root.addEventListener('mouseenter', (e) => {
+      if (running || (e as PointerEvent).pointerType === 'touch') return;
+      collapse();
+      void expand(250);
+    });
+  }
+</script>
+
+<style>
+  .kw {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.12em;
+    max-width: 100%;
+    font-family: var(--font-sans);
+    font-weight: 720;
+    font-variation-settings: 'wdth' 78;
+    font-size: clamp(2.5rem, 11.5vw, 11.25rem);
+    letter-spacing: -0.05em;
+    line-height: 1;
+    white-space: nowrap;
+    cursor: default;
+    user-select: none;
+  }
+
+  .kw__name {
+    display: inline-flex;
+  }
+
+  .kw__word {
+    display: inline-flex;
+  }
+
+  .kw__rest {
+    display: inline-block;
+    overflow: hidden;
+    /* Room for the overhang of italics/kerning so letters never clip. */
+    padding-right: 0.02em;
+    margin-right: -0.02em;
+    vertical-align: bottom;
+  }
+
+  /* Start on "TOP" before the script runs, so the full name never flashes. */
+  @media (prefers-reduced-motion: no-preference) {
+    :global(html.js) .kw:not(.is-ready) .kw__rest {
+      max-width: 0;
+      opacity: 0;
+    }
+
+    :global(html.js) .kw:not(.is-ready) .kw__mark {
+      opacity: 0;
+    }
+  }
+
+  .kw__mark {
+    display: inline-block;
+    padding: 0.08em 0.14em 0.06em;
+    border-radius: 0.12em;
+    background: var(--ink);
+    color: var(--paper);
+    letter-spacing: -0.02em;
+    transform-origin: left center;
+  }
+</style>

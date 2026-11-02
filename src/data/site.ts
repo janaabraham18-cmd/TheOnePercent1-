@@ -10,7 +10,7 @@ export const site = {
   nameMark: '1%',
   kind: 'Web design & branding studio',
   description:
-    'TheOnePercent1% is a web design and branding studio. We design identities and build websites for businesses that want to stand out, and we sweat the small details most people skip.',
+    '99% of websites blend in. TheOnePercent1% is a web design and branding studio that designs brands and builds websites for businesses that want to be the one percent that stands out.',
 
   contact: {
     placeholder: true,

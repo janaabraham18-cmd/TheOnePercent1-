@@ -1,6 +1,7 @@
 ---
 import { Image, getImage } from 'astro:assets';
 import Base from '../../layouts/Base.astro';
+import ClientLogo from '../../components/ClientLogo.astro';
 import { projects, type Project } from '../../data/work';
 import { hl } from '../../utils/text';
 
@@ -59,13 +60,9 @@ const og = await getImage({ src: p.cover.src, width: 1200, format: 'jpg' });
     </header>
 
     <div class="cs-cover wrap">
-      <Image
-        src={p.cover.src}
-        alt={p.cover.alt}
-        widths={[800, 1280, 1600, 2400]}
-        sizes="(min-width: 1440px) 1328px, calc(100vw - 2 * var(--gutter))"
-        loading="eager"
-      />
+      <div class="cs-cover__panel">
+        <ClientLogo id={p.logo} label={`${p.client} logo`} />
+      </div>
     </div>
 
     <section class="cs-section">
@@ -186,11 +183,24 @@ const og = await getImage({ src: p.cover.src, width: 1200, format: 'jpg' });
     text-underline-offset: 3px;
   }
 
-  .cs-cover :global(img) {
-    width: 100%;
-    aspect-ratio: 16 / 9;
-    object-fit: cover;
+  .cs-cover__panel {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    aspect-ratio: 4 / 3;
+    padding: 6%;
     border-radius: 4px;
+    background: #f4f4f2;
+  }
+
+  @media (min-width: 700px) {
+    .cs-cover__panel {
+      aspect-ratio: 21 / 9;
+    }
+  }
+
+  .cs-cover__panel :global(.logo--ss) {
+    font-size: clamp(1.1rem, 0.6rem + 2vw, 2.4rem);
   }
 
   .cs-section {

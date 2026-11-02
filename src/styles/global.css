@@ -312,22 +312,73 @@ body {
 .ink-thread__line {
   fill: none;
   stroke: #fff;
-  stroke-width: 1.4;
-  stroke-opacity: 0.24;
+  stroke-width: 1.7;
+  stroke-opacity: 0.5;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
 
 .ink-thread__tip {
   fill: #fff;
-  fill-opacity: 0.55;
+  fill-opacity: 0.8;
   transition: opacity 0.3s;
+}
+
+/* Section drawings. Every path uses pathLength=1, so a 1/1 dash draws it. */
+.ink-grid path,
+.ink-art path,
+.ink-leaves path {
+  fill: none;
+  stroke: #fff;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 1 1;
+  stroke-dashoffset: 1;
+}
+
+/* Hero blueprint: the faintest layer, a design being built. */
+.ink-grid__col {
+  stroke-width: 1;
+  stroke-opacity: 0.09;
+}
+
+.ink-grid__type,
+.ink-grid__cross {
+  stroke-width: 1;
+  stroke-opacity: 0.28;
+}
+
+.ink-grid__o {
+  stroke-width: 1.2;
+  stroke-opacity: 0.45;
+}
+
+.ink-grid text {
+  fill: #fff;
+  fill-opacity: 0.5;
+  font-family: var(--font-sans);
+  font-size: 9px;
+  font-weight: 560;
+  letter-spacing: 0.14em;
+  opacity: 0;
+}
+
+/* Work: flowing ribbon and sun arcs. */
+.ink-art path {
+  stroke-width: 1.1;
+  stroke-opacity: 0.26;
+}
+
+/* Process: leaves and branch, same weight as the line they grow from. */
+.ink-leaves path {
+  stroke-width: 1.4;
+  stroke-opacity: 0.55;
 }
 
 @media (max-width: 699px) {
   .ink-thread__line {
-    stroke-width: 1.1;
-    stroke-opacity: 0.2;
+    stroke-width: 1.4;
+    stroke-opacity: 0.42;
   }
 }
 

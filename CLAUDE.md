@@ -18,14 +18,23 @@ Astro (static). `npm run build` runs `astro check` before building.
   "other 99%" comparison section sits right under the hero.
 - **Client logos are the only colour on the site.** Portfolio items show the client's logo
   (`ClientLogo.astro`) in its own colours on a light panel, not photos.
-- **The pen line** (`src/scripts/ink.ts`): one faint hand-drawn line runs down every page,
-  curling into spirals between sections. Scroll position moves the pen (down draws, up
-  rewinds). It's white with `mix-blend-mode: difference`, so it reads black on white sections
-  and white on black ones; it sits at z 0 under `.wrap` (z 1), so section backgrounds must
-  stay non-positioned and content must stay inside `.wrap`. The route is computed from the
-  live layout: it comes down the right edge beside the hero wordmark, then for each
-  `[data-mark]` word runs down the left gutter beside the heading and turns into the word's
-  bold mark. Rebuilt on resize and when the page height changes.
+- **The ink layer** (`src/scripts/ink.ts`): one SVG under all content, drawn white with
+  `mix-blend-mode: difference` so it reads black on white sections and white on black ones.
+  It sits at z 0 under `.wrap` (z 1), so section backgrounds must stay non-positioned and
+  content must stay inside `.wrap`. Everything is computed from the live layout and rebuilt
+  on resize / height change. No randomness: the same layout always draws the same.
+  - **Pen line:** a designed route, not a wander. Home: down beside the hero wordmark, along
+    the hero hairline, into each accent word's mark, round the one black dot, down the middle
+    of the 99%/1% comparison, beside each logo panel, along the services row and the details
+    grid, as the process timeline (vine), and round the footer "1%". Other pages: through each
+    `[data-mark]` word. Scroll moves the pen; sideways runs take extra scroll. On phones the
+    line hugs the page edges and only crosses over just above headings.
+  - **Hero blueprint:** 12-column guides plus cap-height / x-height / baseline lines measured
+    from the real wordmark, drawn on load; a construction circle + square on the "O" once TOP
+    finishes stretching (`kw:done` event from `KineticWordmark.astro`).
+  - **Work (black):** a flowing ribbon of parallel lines and sun arcs, drawn as you scroll.
+  - **Process:** leaves sprout off the vine as the pen passes, a tendril curls at its end, and
+    a leafy branch fills the empty space bottom right (desktop).
 - **Marks on accent words.** h1/h2 accent words use `<InkWord mark="...">` (swoosh, double,
   zigzag, circle, strike) instead of a plain `.serif` span; the pen draws the mark when it
   reaches the word. Negative words get `strike` ("forgettable"). h3s stay plain `.serif`.

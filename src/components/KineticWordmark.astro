@@ -71,6 +71,9 @@ const words = [
       mark.style.opacity = '';
       mark.style.transform = '';
       running = false;
+      // The background ink draws its construction lines on the final layout.
+      root.dataset.done = '';
+      window.dispatchEvent(new Event('kw:done'));
     };
 
     collapse();

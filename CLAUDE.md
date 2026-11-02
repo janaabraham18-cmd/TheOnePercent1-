@@ -28,14 +28,6 @@ numbering uses `pad()` from `src/utils/text.ts`.
   exponent (`--gold` on light sections, `--gold-bright` inside `.on-ink`); the hero/footer
   `KineticWordmark.astro`, the brand film's final logo and `public/favicon.svg` match. Always write the name as
   `TheOnePercent1%` (`site.name`) in copy, titles and alt text.
-- **Black header with a dust fade.** The sticky header (`Header.astro`) is `.on-ink` (solid
-  black, bright-gold logo slab) and dissolves into the page through `.site-header__dust`: an
-  inline SVG under the bar where a vertical fade plus `feTurbulence` noise is cut at a hard
-  threshold, so the specks are crisp, not a soft blur. It stays with the header, so content
-  scrolls up into it; it's black on black sections, so it only shows over white ones. Its
-  height is `--dust-h` (global.css); `main` is padded by the same amount so nothing sits under
-  it at rest, and `scroll-padding-top` and SiteCheck's sticky result clear it too. Hidden
-  while the phone menu is open.
 - **Hero "TOP" animation.** `KineticWordmark.astro` starts on "TOP" and stretches out into
   "TheOnePercent", then the "1%" block lands (replays on mouse hover). With no JS or with
   reduced motion it shows the full name. Keep its size cap in step with the footer wordmark

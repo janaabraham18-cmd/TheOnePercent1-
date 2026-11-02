@@ -26,8 +26,6 @@
   --gutter: clamp(16px, 4vw, 56px);
   --max: 1440px;
   --header-h: 72px;
-  /* The dust fade under the black header (Header.astro). */
-  --dust-h: clamp(44px, 5vw, 76px);
 
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
 }
@@ -44,7 +42,7 @@
 
 html {
   -webkit-text-size-adjust: 100%;
-  scroll-padding-top: calc(var(--header-h) + var(--dust-h));
+  scroll-padding-top: calc(var(--header-h) + 16px);
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -248,11 +246,6 @@ ol {
 
 .btn:hover .btn__arrow {
   transform: translateX(3px);
-}
-
-/* Every page starts below the header's dust fade, so it never covers content at rest. */
-main {
-  padding-top: var(--dust-h);
 }
 
 /* Home page sections (src/components/home/) share one rhythm and heading scale. */

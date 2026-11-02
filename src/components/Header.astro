@@ -3,7 +3,7 @@ import Wordmark from './Wordmark.astro';
 import { site, nav } from '../data/site';
 ---
 
-<header class="site-header on-ink" data-header>
+<header class="site-header" data-header>
   <div class="site-header__inner wrap">
     <a class="site-header__logo" href="/" aria-label={`${site.name} home`}>
       <Wordmark />
@@ -30,30 +30,6 @@ import { site, nav } from '../data/site';
     </button>
   </div>
 
-  <!-- The black bar dissolves into the page as a crisp dust fade: a vertical
-       fade plus noise, cut at a hard threshold so every speck has a clean
-       edge (no soft blur). Pure SVG, drawn once, no script. -->
-  <svg class="site-header__dust" aria-hidden="true" focusable="false">
-    <defs>
-      <linearGradient id="dust-fade" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0" stop-color="#000" stop-opacity="1" />
-        <stop offset="1" stop-color="#000" stop-opacity="0" />
-      </linearGradient>
-      <!-- alpha = 2.2 * fade + 3 * noise - 2.1, then cut at 0.5: solid where it
-           meets the bar, fully clear before the bottom edge. -->
-      <filter id="dust" x="0" y="0" width="1" height="1" color-interpolation-filters="sRGB">
-        <feTurbulence type="fractalNoise" baseFrequency="0.55" numOctaves="4" seed="11" result="noise" />
-        <feComposite in="SourceGraphic" in2="noise" operator="arithmetic" k2="2.2" k3="3" k4="-2.1" result="mix" />
-        <feComponentTransfer in="mix" result="cut">
-          <feFuncA type="discrete" tableValues="0 1" />
-        </feComponentTransfer>
-        <feFlood flood-color="#0b0b0b" />
-        <feComposite in2="cut" operator="in" />
-      </filter>
-    </defs>
-    <rect width="100%" height="100%" fill="url(#dust-fade)" filter="url(#dust)" />
-  </svg>
-
   <div class="mobile-menu on-ink" id="mobile-menu" hidden data-menu>
     <nav class="wrap" aria-label="Main (mobile)">
       <ul>
@@ -68,6 +44,7 @@ import { site, nav } from '../data/site';
 </header>
 
 <script>
+  const header = document.querySelector<HTMLElement>('[data-header]');
   const toggle = document.querySelector<HTMLButtonElement>('[data-menu-toggle]');
   const menu = document.querySelector<HTMLElement>('[data-menu]');
 
@@ -85,6 +62,10 @@ import { site, nav } from '../data/site';
   });
   // Close the menu if the window is widened past the desktop breakpoint.
   matchMedia('(min-width: 960px)').addEventListener('change', (e) => e.matches && setOpen(false));
+
+  const onScroll = () => header?.classList.toggle('is-scrolled', window.scrollY > 8);
+  onScroll();
+  window.addEventListener('scroll', onScroll, { passive: true });
 </script>
 
 <style>
@@ -92,21 +73,15 @@ import { site, nav } from '../data/site';
     position: sticky;
     top: 0;
     z-index: 50;
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.3s var(--ease-out);
   }
 
-  /* Hangs under the bar and stays with it, so the page scrolls up into the
-     dust. Black on black sections, so it only shows over white ones. */
-  .site-header__dust {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    width: 100%;
-    height: var(--dust-h);
-    pointer-events: none;
-  }
-
-  :global(html.menu-open) .site-header__dust {
-    display: none;
+  .site-header.is-scrolled {
+    border-bottom-color: var(--line);
   }
 
   .site-header__inner {
@@ -118,7 +93,7 @@ import { site, nav } from '../data/site';
   }
 
   .site-header__logo {
-    color: inherit;
+    color: var(--ink);
     text-decoration: none;
     flex-shrink: 0;
   }
@@ -148,7 +123,7 @@ import { site, nav } from '../data/site';
     right: 0;
     bottom: -4px;
     height: 1px;
-    background: var(--gold-here);
+    background: var(--gold);
     transform: scaleX(0);
     transform-origin: right;
     transition: transform 0.35s var(--ease-out);
@@ -173,7 +148,7 @@ import { site, nav } from '../data/site';
     margin-right: -12px;
     border: 0;
     background: none;
-    color: inherit;
+    color: var(--ink);
     cursor: pointer;
   }
 

@@ -1,6 +1,10 @@
 # Still to confirm before launch
 
 - [ ] **Email**: `hello@theonepercent1.com` in `src/data/site.ts` is a stand-in. Swap in the real inbox.
+- [ ] **Enquiry form inbox**: the Contact form opens the visitor's email app until a form
+      service is connected. Create a free form at formspree.io with your inbox, then paste its
+      id into `formspreeId` in `src/data/site.ts`; after that, enquiries arrive straight in
+      your inbox and visitors see a thank-you on the page.
 - [ ] **Domain**: `https://theonepercent1.com` in `astro.config.mjs` and `public/robots.txt` is a guess.
 - [ ] **WhatsApp / phone** (optional): fill `contact.whatsapp` + `whatsappLabel` in `site.ts` to show it.
 - [ ] **Instagram / LinkedIn** (optional): fill `social` in `site.ts`; empty links are hidden.

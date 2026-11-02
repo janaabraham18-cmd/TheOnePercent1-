@@ -4,6 +4,8 @@ import KineticWordmark from '../components/KineticWordmark.astro';
 import ClientLogo from '../components/ClientLogo.astro';
 import InkWord from '../components/InkWord.astro';
 import BrandFilm from '../components/BrandFilm.astro';
+import EnquiryForm from '../components/EnquiryForm.astro';
+import SiteCheck from '../components/SiteCheck.astro';
 import { site } from '../data/site';
 import { services, addons, details, process } from '../data/services';
 import { projects } from '../data/work';
@@ -26,7 +28,7 @@ const compare = [
   <section class="hero">
     <div class="wrap">
       <p class="label">{site.kind}</p>
-      <KineticWordmark />
+      <KineticWordmark hero />
       <div class="hero__foot">
         <h1 class="hero__title" data-reveal>
           <span class="hero__line">99% of websites blend in.</span>
@@ -77,6 +79,7 @@ const compare = [
           </div>
         ))}
       </div>
+      <SiteCheck />
     </div>
   </section>
 
@@ -249,8 +252,12 @@ const compare = [
       </h2>
 
       <div class="contact__grid">
-        <div data-reveal>
-          <p class="contact__lede">Tell us about your business and what you need. We reply to every enquiry ourselves.</p>
+        <div class="contact__side" data-reveal>
+          <p class="contact__lede">
+            Tell us about your business and what you need. We read every enquiry ourselves and come back with a
+            clear scope and a fixed quote.
+          </p>
+          <p class="contact__alt-label">Prefer email?</p>
           <a class="contact__email" href={`mailto:${site.contact.email}?subject=New%20project`}>
             {site.contact.email}
           </a>
@@ -260,15 +267,7 @@ const compare = [
             </p>
           )}
         </div>
-        <div class="contact__help" data-reveal style="--reveal-delay: 0.08s">
-          <h3 class="contact__help-title">What helps us quote</h3>
-          <ul>
-            <li>What your business does and who your customers are</li>
-            <li>What you need: a brand, a website or both</li>
-            <li>Any deadline you’re working towards</li>
-            <li>A few websites or brands you like, and why</li>
-          </ul>
-        </div>
+        <EnquiryForm />
       </div>
     </div>
   </section>
@@ -853,10 +852,19 @@ const compare = [
     color: var(--muted-on-ink);
   }
 
+  .contact__alt-label {
+    margin-bottom: 8px;
+    font-size: 0.75rem;
+    font-weight: 560;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted-on-ink);
+  }
+
   .contact__email {
     display: inline-block;
     max-width: 100%;
-    font-size: clamp(1.5rem, 0.9rem + 3vw, 3.5rem);
+    font-size: clamp(1.25rem, 0.95rem + 1.2vw, 2rem);
     font-weight: 600;
     font-variation-settings: 'wdth' 82;
     letter-spacing: -0.03em;
@@ -878,24 +886,11 @@ const compare = [
     color: var(--muted-on-ink);
   }
 
-  .contact__help-title {
-    margin-bottom: 16px;
-    font-size: 0.8rem;
-    font-weight: 560;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    font-variation-settings: 'wdth' 100;
-    color: var(--muted-on-ink);
-  }
 
-  .contact__help li {
-    padding: 12px 0;
-    border-top: 1px solid var(--line-on-ink);
-  }
 
   @media (min-width: 900px) {
     .contact__grid {
-      grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+      grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.4fr);
       align-items: start;
     }
   }

@@ -1,8 +1,20 @@
 ---
-// Hero wordmark: starts as "TOP" and stretches out into "TheOnePercent",
-// then the "1%" block lands. Without JS, or with reduced motion, it simply
-// shows the full name.
+// The kinetic wordmark: starts as "TOP" and stretches out into
+// "TheOnePercent", then the "1%" block lands. Without JS, or with reduced
+// motion, it simply shows the full name.
+//
+// trigger="load" (the hero) plays shortly after the page loads.
+// trigger="view" (the footer) waits on "TOP" until it scrolls into view.
+// Only the hero announces kw:done with detail.hero, which the background
+// ink uses for its construction circle on the "O".
 import { site } from '../data/site';
+
+interface Props {
+  trigger?: 'load' | 'view';
+  hero?: boolean;
+  decorative?: boolean;
+}
+const { trigger = 'load', hero = false, decorative = false } = Astro.props;
 
 const words = [
   ['T', 'he'],
@@ -11,7 +23,15 @@ const words = [
 ];
 ---
 
-<div class="kw" role="img" aria-label={site.name} data-kw>
+<div
+  class="kw"
+  role={decorative ? undefined : 'img'}
+  aria-label={decorative ? undefined : site.name}
+  aria-hidden={decorative ? 'true' : undefined}
+  data-kw
+  data-kw-trigger={trigger}
+  data-kw-hero={hero ? '' : undefined}
+>
   <span class="kw__name" aria-hidden="true">
     {words.map(([cap, rest]) => (
       <span class="kw__word"><span class="kw__cap">{cap}</span><span class="kw__rest" data-kw-rest>{rest}</span></span>
@@ -20,13 +40,14 @@ const words = [
 </div>
 
 <script>
-  const root = document.querySelector<HTMLElement>('[data-kw]');
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  if (root && !reduce && 'animate' in root) {
+  for (const root of document.querySelectorAll<HTMLElement>('[data-kw]')) {
+    if (reduce || !('animate' in root)) continue;
     const rests = [...root.querySelectorAll<HTMLElement>('[data-kw-rest]')];
     const mark = root.querySelector<HTMLElement>('[data-kw-mark]')!;
     const ease = 'cubic-bezier(0.65, 0, 0.35, 1)';
+    const isHero = root.dataset.kwHero !== undefined;
     let running = false;
 
     const collapse = () => {
@@ -71,19 +92,34 @@ const words = [
       mark.style.opacity = '';
       mark.style.transform = '';
       running = false;
-      // The background ink draws its construction lines on the final layout.
       root.dataset.done = '';
-      window.dispatchEvent(new Event('kw:done'));
+      // The background ink redraws on the final layout (and, for the hero,
+      // draws its construction circle on the "O").
+      window.dispatchEvent(new CustomEvent('kw:done', { detail: { hero: isHero } }));
     };
 
     collapse();
     root.classList.add('is-ready');
-    // Hold on "TOP" for a beat so it reads before it stretches.
-    void expand(900);
 
-    // Replay on hover (mouse only), once the first run has finished.
+    if (root.dataset.kwTrigger === 'view') {
+      // Play once, the first time most of it is on screen.
+      const io = new IntersectionObserver(
+        ([entry]) => {
+          if (!entry.isIntersecting) return;
+          io.disconnect();
+          void expand(200);
+        },
+        { threshold: 0.6 },
+      );
+      io.observe(root);
+    } else {
+      // Hold on "TOP" for a beat so it reads before it stretches.
+      void expand(900);
+    }
+
+    // Replay on hover (mouse only), once a run has finished.
     root.addEventListener('mouseenter', (e) => {
-      if (running || (e as PointerEvent).pointerType === 'touch') return;
+      if (running || root.dataset.done === undefined || (e as PointerEvent).pointerType === 'touch') return;
       collapse();
       void expand(250);
     });
@@ -144,5 +180,10 @@ const words = [
     color: var(--ink);
     letter-spacing: -0.02em;
     transform-origin: left center;
+  }
+
+  /* The brighter gold reads better against black (the footer). */
+  :global(.on-ink) .kw__mark {
+    background: var(--gold-bright);
   }
 </style>

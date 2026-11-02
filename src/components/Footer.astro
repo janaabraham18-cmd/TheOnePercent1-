@@ -1,5 +1,5 @@
 ---
-import Wordmark from './Wordmark.astro';
+import KineticWordmark from './KineticWordmark.astro';
 import { site, nav } from '../data/site';
 
 const year = new Date().getFullYear();
@@ -27,7 +27,7 @@ const socials = [
     </div>
 
     <a class="site-footer__mark" href="/" aria-label={`${site.name} home`}>
-      <Wordmark size="lg" />
+      <KineticWordmark trigger="view" decorative />
     </a>
 
     <div class="site-footer__bottom">

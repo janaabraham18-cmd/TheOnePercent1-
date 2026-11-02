@@ -192,7 +192,8 @@ function build() {
     const c = { x: r.x + r.w / 2, y: r.y + r.h / 2 };
     const rx = r.w / 2 + padX;
     const ry = r.h / 2 + padY;
-    travel({ x: c.x - rx * 1.2, y: c.y - ry * 1.3 }, 0.5);
+    // Down the quiet left side (past the contact form, not through it).
+    travel({ x: c.x - rx * 1.2, y: c.y - ry * 1.3 }, 0.03);
     const steps = 12;
     for (let s = 0; s <= steps; s++) {
       const a = Math.PI * 1.2 + (s / steps) * Math.PI * 2.15;
@@ -202,7 +203,7 @@ function build() {
   };
 
   const markIn = (sel: string) => $(sel)?.querySelector<HTMLElement>('[data-mark]') ?? null;
-  const kw = $('.kw');
+  const kw = $('[data-kw-hero]');
   const heroFoot = $('.hero__foot');
   const header = $('.site-header')?.offsetHeight ?? 72;
 
@@ -309,7 +310,7 @@ function build() {
   }
 
   // Footer: loop the "1%" block in the big wordmark and leave to the right.
-  const fm = $('.site-footer__mark .wordmark__mark');
+  const fm = $('.site-footer__mark .kw__mark, .site-footer__mark .wordmark__mark');
   if (fm) {
     const F = rect(fm);
     loopAround(F, narrow ? 10 : 24, narrow ? 8 : 18, { x: W + 40, y: F.y + F.h + 60 });
@@ -592,10 +593,12 @@ const rebuild = () => {
 
 // The "O" construction waits for TOP to finish stretching (or shows at once
 // when there's no animation).
-const kwEl = $('.kw');
+const kwEl = $('[data-kw-hero]');
 if (!kwEl || !kwEl.classList.contains('is-ready') || kwEl.dataset.done !== undefined) kwDoneAt = loadedAt - 1000;
-window.addEventListener('kw:done', () => {
-  kwDoneAt = performance.now();
+window.addEventListener('kw:done', (e) => {
+  // Any wordmark finishing changes the layout the line is drawn around; only
+  // the hero's starts the construction circle on its "O".
+  if ((e as CustomEvent).detail?.hero) kwDoneAt = performance.now();
   build();
   render();
 });

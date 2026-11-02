@@ -21,6 +21,11 @@ export const site = {
     location: '',
   },
 
+  // Formspree form id for the enquiry form (create a free form at formspree.io
+  // with your inbox, then paste its id, e.g. 'xyzabcde'). While it's empty,
+  // the form opens the visitor's email app with their enquiry filled in.
+  formspreeId: '',
+
   social: {
     placeholder: true,
     instagram: '',

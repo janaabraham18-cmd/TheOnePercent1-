@@ -1,0 +1,342 @@
+---
+// Project enquiry form for the Contact section (sits on black).
+// With site.formspreeId set it sends through Formspree and shows a thank-you;
+// without it, it opens the visitor's email app with the enquiry filled in.
+// Any link with data-prefill="<need id>" (e.g. the 99% quick check) ticks that
+// service here before scrolling down.
+import { site } from '../data/site';
+import { needs, timelines } from '../data/enquiry';
+---
+
+<form
+  class="enquiry"
+  data-enquiry
+  data-endpoint={site.formspreeId ? `https://formspree.io/f/${site.formspreeId}` : ''}
+  data-email={site.contact.email}
+  novalidate
+>
+  <fieldset class="enquiry__group">
+    <legend class="enquiry__legend">What do you need?</legend>
+    <div class="chips">
+      {needs.map((n) => (
+        <label class="chip">
+          <input type="checkbox" name="needs" value={n.label} id={`need-${n.id}`} data-need={n.id} />
+          <span>{n.label}</span>
+        </label>
+      ))}
+    </div>
+  </fieldset>
+
+  <div class="enquiry__row">
+    <div class="field">
+      <label for="enq-name">Your name</label>
+      <input id="enq-name" name="name" type="text" autocomplete="name" required />
+    </div>
+    <div class="field">
+      <label for="enq-email">Email</label>
+      <input id="enq-email" name="email" type="email" autocomplete="email" required />
+    </div>
+  </div>
+
+  <div class="field">
+    <label for="enq-business">Business name or current website <span class="optional">(optional)</span></label>
+    <input id="enq-business" name="business" type="text" autocomplete="organization" />
+  </div>
+
+  <fieldset class="enquiry__group">
+    <legend class="enquiry__legend">When would you like to start?</legend>
+    <div class="chips">
+      {timelines.map((t) => (
+        <label class="chip">
+          <input type="radio" name="timeline" value={t.label} id={`when-${t.id}`} />
+          <span>{t.label}</span>
+        </label>
+      ))}
+    </div>
+  </fieldset>
+
+  <div class="field">
+    <label for="enq-message">Tell us about the project</label>
+    <textarea id="enq-message" name="message" rows="4" placeholder="What your business does, who it’s for, and anything you already know you want."></textarea>
+  </div>
+
+  <!-- Spam trap: people never see or fill this. -->
+  <div class="trap" aria-hidden="true">
+    <label for="enq-gotcha">Leave this empty</label>
+    <input id="enq-gotcha" name="_gotcha" type="text" tabindex="-1" autocomplete="off" />
+  </div>
+
+  <div class="enquiry__foot">
+    <button class="btn" type="submit" data-enquiry-submit>
+      Send enquiry <span class="btn__arrow" aria-hidden="true">→</span>
+    </button>
+    <p class="enquiry__status" role="status" aria-live="polite" data-enquiry-status></p>
+  </div>
+</form>
+
+<div class="enquiry-done" data-enquiry-done hidden>
+  <p class="enquiry-done__title">Thanks, <span data-enquiry-name></span>. It’s on its way.</p>
+  <p>We read every enquiry ourselves and will reply to <span data-enquiry-email></span>.</p>
+</div>
+
+<script>
+  const form = document.querySelector<HTMLFormElement>('[data-enquiry]');
+  if (form) {
+    const status = form.querySelector<HTMLElement>('[data-enquiry-status]')!;
+    const submit = form.querySelector<HTMLButtonElement>('[data-enquiry-submit]')!;
+    const done = document.querySelector<HTMLElement>('[data-enquiry-done]')!;
+    const endpoint = form.dataset.endpoint ?? '';
+    const inbox = form.dataset.email ?? '';
+
+    // Links elsewhere on the page can pre-select a service.
+    document.addEventListener('click', (e) => {
+      const link = (e.target as Element).closest<HTMLElement>('[data-prefill]');
+      if (!link) return;
+      const box = form.querySelector<HTMLInputElement>(`[data-need="${link.dataset.prefill}"]`);
+      if (box) box.checked = true;
+    });
+
+    const say = (text: string) => (status.textContent = text);
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const data = new FormData(form);
+      const name = String(data.get('name') ?? '').trim();
+      const email = String(data.get('email') ?? '').trim();
+      if (String(data.get('_gotcha') ?? '')) return;
+
+      const nameEl = form.querySelector<HTMLInputElement>('#enq-name')!;
+      const emailEl = form.querySelector<HTMLInputElement>('#enq-email')!;
+      nameEl.toggleAttribute('aria-invalid', !name);
+      emailEl.toggleAttribute('aria-invalid', !emailEl.checkValidity() || !email);
+      if (!name) {
+        say('Add your name so we know who we’re talking to.');
+        nameEl.focus();
+        return;
+      }
+      if (!email || !emailEl.checkValidity()) {
+        say('Add an email address we can reply to, like name@business.com.');
+        emailEl.focus();
+        return;
+      }
+
+      const picked = data.getAll('needs').map(String);
+      const timeline = String(data.get('timeline') ?? '');
+      const business = String(data.get('business') ?? '').trim();
+      const message = String(data.get('message') ?? '').trim();
+
+      if (!endpoint) {
+        // No form service yet: hand the enquiry to the visitor's email app.
+        const lines = [`Name: ${name}`, `Email: ${email}`];
+        if (business) lines.push(`Business / website: ${business}`);
+        if (picked.length) lines.push(`Needs: ${picked.join(', ')}`);
+        if (timeline) lines.push(`Timeline: ${timeline}`);
+        if (message) lines.push('', message);
+        const subject = `New project enquiry${picked.length ? `: ${picked.join(', ')}` : ''}`;
+        window.location.href = `mailto:${inbox}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(lines.join('\n'))}`;
+        say(`Your email app should open with this filled in. If it doesn’t, email us at ${inbox}.`);
+        return;
+      }
+
+      submit.disabled = true;
+      say('Sending…');
+      try {
+        const res = await fetch(endpoint, {
+          method: 'POST',
+          headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, email, business, needs: picked.join(', '), timeline, message, _subject: `New project enquiry from ${name}` }),
+        });
+        if (!res.ok) throw new Error(String(res.status));
+        done.querySelector('[data-enquiry-name]')!.textContent = name;
+        done.querySelector('[data-enquiry-email]')!.textContent = email;
+        form.hidden = true;
+        done.hidden = false;
+        done.setAttribute('tabindex', '-1');
+        done.focus();
+      } catch {
+        submit.disabled = false;
+        say(`That didn’t send. Please try again, or email us at ${inbox}.`);
+      }
+    });
+  }
+</script>
+
+<style>
+  .enquiry {
+    display: grid;
+    gap: 28px;
+  }
+
+  .enquiry__group {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    min-width: 0;
+  }
+
+  .enquiry__legend,
+  .field label {
+    display: block;
+    margin-bottom: 12px;
+    font-size: 0.75rem;
+    font-weight: 560;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted-on-ink);
+  }
+
+  .optional {
+    letter-spacing: 0.04em;
+    text-transform: none;
+    opacity: 0.8;
+  }
+
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .chip {
+    position: relative;
+    cursor: pointer;
+  }
+
+  .chip input {
+    position: absolute;
+    opacity: 0;
+    inset: 0;
+    margin: 0;
+    cursor: pointer;
+  }
+
+  .chip span {
+    display: inline-flex;
+    align-items: center;
+    min-height: 40px;
+    padding: 0 16px;
+    border: 1px solid var(--line-on-ink);
+    border-radius: 999px;
+    font-size: 0.92rem;
+    transition:
+      background-color 0.2s var(--ease-out),
+      color 0.2s var(--ease-out),
+      border-color 0.2s var(--ease-out);
+  }
+
+  .chip:hover span {
+    border-color: var(--muted-on-ink);
+  }
+
+  .chip input:checked + span {
+    background: var(--paper);
+    border-color: var(--paper);
+    color: var(--ink);
+  }
+
+  .chip input:focus-visible + span {
+    outline: 2px solid var(--gold-bright);
+    outline-offset: 3px;
+  }
+
+  .enquiry__row {
+    display: grid;
+    gap: 28px;
+  }
+
+  @media (min-width: 640px) {
+    .enquiry__row {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  .field {
+    min-width: 0;
+  }
+
+  .field input,
+  .field textarea {
+    display: block;
+    width: 100%;
+    padding: 10px 0 12px;
+    border: 0;
+    border-bottom: 1px solid var(--line-on-ink);
+    border-radius: 0;
+    background: transparent;
+    color: var(--paper);
+    font: inherit;
+    font-size: 1.1rem;
+    transition: border-color 0.2s var(--ease-out);
+  }
+
+  .field textarea {
+    resize: vertical;
+    min-height: 110px;
+    line-height: 1.5;
+  }
+
+  .field input::placeholder,
+  .field textarea::placeholder {
+    color: #6f6f6f;
+  }
+
+  .field input:focus,
+  .field textarea:focus {
+    outline: none;
+    border-bottom-color: var(--gold-bright);
+  }
+
+  .field input[aria-invalid] {
+    border-bottom-color: var(--gold-bright);
+  }
+
+  .trap {
+    position: absolute;
+    left: -9999px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+  }
+
+  .enquiry__foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 16px 24px;
+  }
+
+  .enquiry__foot .btn:disabled {
+    opacity: 0.6;
+    cursor: wait;
+  }
+
+  .enquiry__status {
+    max-width: 46ch;
+    font-size: 0.92rem;
+    color: var(--muted-on-ink);
+  }
+
+  .enquiry__status:empty {
+    display: none;
+  }
+
+  .enquiry-done {
+    padding: 32px 0;
+    border-top: 1px solid var(--gold-bright);
+    color: var(--muted-on-ink);
+  }
+
+  .enquiry-done:focus {
+    outline: none;
+  }
+
+  .enquiry-done__title {
+    margin-bottom: 10px;
+    font-size: clamp(1.5rem, 1.2rem + 1.2vw, 2.25rem);
+    font-weight: 640;
+    font-variation-settings: 'wdth' 82;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    color: var(--paper);
+  }
+</style>

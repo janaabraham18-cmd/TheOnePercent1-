@@ -56,6 +56,17 @@ Astro (static). `npm run build` runs `astro check` before building.
   screen, has a pause button, uses 4:5 on phones, and shows the final frame (27 s) for reduced
   motion. Full-screen flashes stay under three per second; keep it that way. The service list
   in the film is hard-coded in `brand-film.js`, so update it if `services.ts` changes.
+- **Enquiry form** (`EnquiryForm.astro`, Contact): service chips, name, email, business,
+  timeline, message. Sends via Formspree when `site.formspreeId` is set; otherwise opens the
+  visitor's email app with the enquiry filled in. Any element with `data-prefill="<need id>"`
+  ticks that service before jumping to `#contact`. Copy lives in `src/data/enquiry.ts`.
+- **"Is your site in the 99%?"** (`SiteCheck.astro`, under the 99% comparison): six yes/no
+  questions; the result places "your site" in a 100-dot grid (6/6 = the gold dot) and its
+  button pre-selects the 1% Audit (or Care) in the enquiry form. Nothing is sent anywhere.
+- **Footer wordmark** uses `KineticWordmark` with `trigger="view"`: it waits on "TOP" and
+  stretches out the first time it scrolls into view. Only the hero instance (`hero` prop,
+  `[data-kw-hero]`) drives the ink's "O" construction; every instance fires `kw:done` so the
+  ink redraws around the final layout.
 - **Marks on accent words.** h1/h2 accent words use `<InkWord mark="...">` (swoosh, double,
   zigzag, circle, strike) instead of a plain `.serif` span; the pen draws the mark when it
   reaches the word. Negative words get `strike` ("forgettable"). h3s stay plain `.serif`.

@@ -473,3 +473,16 @@ body {
   top: 40%;
   height: 0.28em;
 }
+
+/* On small phones the longer hero label ("Web design, branding & motion
+   studio") only fits on one line with slightly tighter tracking and
+   without its trailing rule. */
+@media (max-width: 419px) {
+  .label {
+    letter-spacing: 0.1em;
+  }
+
+  .hero .label::after {
+    display: none;
+  }
+}

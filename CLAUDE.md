@@ -1,6 +1,6 @@
 # Working on this site
 
-The studio's own website: TheOnePercent1%, a web design and branding studio.
+The studio's own website: TheOnePercent1%, a web design, branding and motion studio.
 Astro (static). `npm run build` runs `astro check` before building.
 
 ## Brand rules

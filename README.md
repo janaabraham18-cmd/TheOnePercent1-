@@ -1,6 +1,6 @@
 # TheOnePercent1%
 
-The website for TheOnePercent1%, a web design and branding studio. Built with
+The website for TheOnePercent1%, a web design, branding and motion studio. Built with
 [Astro](https://astro.build) as a static site.
 
 ```sh

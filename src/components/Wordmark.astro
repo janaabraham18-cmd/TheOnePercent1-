@@ -1,5 +1,5 @@
 ---
-// The logo is the name: "TheOnePercent" with the "1%" set in a solid block.
+// The logo is the name: "TheOnePercent" with the "1%" set in a solid gold block.
 // Screen readers get the name as one string via aria-label on the parent link.
 import { site } from '../data/site';
 
@@ -42,13 +42,13 @@ const { size = 'sm', class: className } = Astro.props;
     display: inline-block;
     padding: 0.08em 0.14em 0.06em;
     border-radius: 0.12em;
-    background: var(--ink);
-    color: var(--paper);
+    background: var(--gold);
+    color: var(--ink);
     letter-spacing: -0.02em;
   }
 
+  /* The brighter gold reads better against black. */
   :global(.on-ink) .wordmark__mark {
-    background: var(--paper);
-    color: var(--ink);
+    background: var(--gold-bright);
   }
 </style>

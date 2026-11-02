@@ -1,7 +1,17 @@
 # Working on this site
 
 The studio's own website: TheOnePercent1%, a web design, branding and motion studio.
-Astro (static). `npm run build` runs `astro check` before building.
+Astro (static). `npm run build` runs `astro check` before building; `npm test` builds and
+then runs the layout checks in `tests/layout.mjs`.
+
+## Structure
+
+The home page (`src/pages/index.astro`) only lists its sections; each one is its own file in
+`src/components/home/` (Hero, NinetyNine, Work, Services, Details, Process, About, Contact),
+with its markup and scoped styles together. Every home section has the global `.section`
+class (shared vertical rhythm), and the shared `.section-head`, `.section-head--split`,
+`.section-title` and `.section-intro` styles live in `src/styles/global.css`. Two-digit
+numbering uses `pad()` from `src/utils/text.ts`.
 
 ## Brand rules
 
@@ -29,8 +39,10 @@ Astro (static). `npm run build` runs `astro check` before building.
 - **The ink layer** (`src/scripts/ink.ts`): one SVG under all content, drawn white with
   `mix-blend-mode: difference` so it reads black on white sections and white on black ones.
   It sits at z 0 under `.wrap` (z 1), so section backgrounds must stay non-positioned and
-  content must stay inside `.wrap`. Everything is computed from the live layout and rebuilt
-  on resize / height change. No randomness: the same layout always draws the same.
+  content must stay inside `.wrap`. The home route is drawn around specific class names
+  (`HOME_ROUTE_NEEDS` in `ink.ts`); if one goes missing it logs an `[ink]` console warning
+  and `npm test` fails. Rename a section's classes in both places, or update the list.
+  Everything is computed from the live layout and rebuilt on resize / height change. No randomness: the same layout always draws the same.
   - **Pen line:** a designed route, not a wander. Home: down beside the hero wordmark, along
     the hero hairline, into each accent word's mark, round the one black dot, down the middle
     of the 99%/1% comparison, beside each logo panel, along the services row and the details
@@ -68,7 +80,7 @@ Astro (static). `npm run build` runs `astro check` before building.
   stretches out the first time it scrolls into view. Only the hero instance (`hero` prop,
   `[data-kw-hero]`) drives the ink's "O" construction; every instance fires `kw:done` so the
   ink redraws around the final layout.
-- **About** (`AboutSection.astro`, copy in `src/data/about.ts`): a full-width manifesto h2 that
+- **About** (`home/About.astro`, copy in `src/data/about.ts`): a full-width manifesto h2 that
   fills from grey to black word by word as it scrolls up (accent word "obsess" gets the gold
   circle mark), four big honest numbers that count up once (the 1 in gold), then a closing
   line and CTA. Reduced motion / no JS: everything shows at once.
@@ -86,8 +98,12 @@ as they're confirmed.
 
 ## Test the full device range
 
-Check 375, 768, 1024, 1280, 1440, 1920 and 2560px with Playwright, and confirm
-`document.documentElement.scrollWidth - innerWidth` is 0 on every page. Pair `vw` sizes with
-`clamp()`. In grid rows pairing a photo with text, use `align-items: start`.
+Run `npm test` before pushing. It builds, then loads every page at 375, 768, 1024, 1280,
+1440, 1920 and 2560px and fails on sideways scroll (`scrollWidth - innerWidth` must be 0),
+script or console errors, `[ink]` warnings, the header showing the wrong nav for the width,
+or the brand film / quick check / enquiry form validation not working. It doesn't judge how
+things look, so still screenshot anything you change at a few of those widths.
+
+Pair `vw` sizes with `clamp()`. In grid rows pairing a photo with text, use `align-items: start`.
 The header switches from the hamburger to the full nav at 960px (logo 161px + nav 480px
 measured); re-measure if links are added.

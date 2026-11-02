@@ -5,13 +5,12 @@
 import { site } from '../data/site';
 
 interface Props {
-  size?: 'sm' | 'lg';
   class?: string;
 }
-const { size = 'sm', class: className } = Astro.props;
+const { class: className } = Astro.props;
 ---
 
-<span class:list={['wordmark', `wordmark--${size}`, className]} aria-hidden="true">
+<span class:list={['wordmark', className]} aria-hidden="true">
   <span class="wordmark__lead">{site.nameLead}</span><span class="wordmark__mark">{site.nameMark.slice(0, -1)}<span class="wordmark__pct">{site.nameMark.slice(-1)}</span></span>
 </span>
 
@@ -26,19 +25,10 @@ const { size = 'sm', class: className } = Astro.props;
     letter-spacing: -0.04em;
     line-height: 1;
     white-space: nowrap;
-  }
-
-  .wordmark--sm {
     font-size: 1.375rem;
   }
 
-  .wordmark--lg {
-    font-size: clamp(2.5rem, 11.5vw, 11.25rem);
-    letter-spacing: -0.05em;
-  }
-
-  /* The "1%" sits in a solid block: ink on paper backgrounds, and
-     inverted on .on-ink sections. */
+  /* The "1%" sits in a sharp gold slab with black type. */
   .wordmark__mark {
     display: inline-flex;
     align-items: flex-start;

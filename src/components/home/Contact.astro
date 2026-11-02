@@ -1,0 +1,99 @@
+---
+// 07 Contact: the enquiry form, plus the email address for anyone who prefers it.
+import InkWord from '../InkWord.astro';
+import EnquiryForm from '../EnquiryForm.astro';
+import { site } from '../../data/site';
+---
+
+<section class="section contact on-ink" id="contact" aria-labelledby="contact-title">
+  <div class="wrap">
+    <p class="label"><span class="label__num">07</span> Contact</p>
+    <h2 id="contact-title" class="contact__title" data-reveal>
+      Let’s build your <InkWord mark="double">one percent</InkWord>.
+    </h2>
+
+    <div class="contact__grid">
+      <div class="contact__side" data-reveal>
+        <p class="contact__lede">
+          Tell us about your business and what you need. We read every enquiry ourselves and come back with a
+          clear scope and a fixed quote.
+        </p>
+        <p class="contact__alt-label">Prefer email?</p>
+        <a class="contact__email" href={`mailto:${site.contact.email}?subject=New%20project`}>
+          {site.contact.email}
+        </a>
+        {site.contact.whatsapp && (
+          <p class="contact__alt">
+            Or WhatsApp us on <a href={site.contact.whatsapp}>{site.contact.whatsappLabel}</a>
+          </p>
+        )}
+      </div>
+      <EnquiryForm />
+    </div>
+  </div>
+</section>
+
+<style>
+  .contact__title {
+    max-width: 14ch;
+    margin-bottom: clamp(48px, 7vw, 104px);
+    font-size: clamp(3rem, 1.4rem + 7.4vw, 9.5rem);
+    line-height: 0.92;
+  }
+
+  .contact__grid {
+    display: grid;
+    gap: 56px clamp(48px, 7vw, 128px);
+    padding-top: 32px;
+    border-top: 1px solid var(--paper);
+  }
+
+  .contact__lede {
+    max-width: 40ch;
+    margin-bottom: 28px;
+    color: var(--muted-on-ink);
+  }
+
+  .contact__alt-label {
+    margin-bottom: 8px;
+    font-size: 0.75rem;
+    font-weight: 560;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted-on-ink);
+  }
+
+  .contact__email {
+    display: inline-block;
+    max-width: 100%;
+    font-size: clamp(1.25rem, 0.95rem + 1.2vw, 2rem);
+    font-weight: 600;
+    font-variation-settings: 'wdth' 82;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    overflow-wrap: anywhere;
+    text-decoration: underline;
+    text-decoration-color: var(--gold-bright);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 0.18em;
+    transition: text-underline-offset 0.3s var(--ease-out);
+  }
+
+  .contact__email:hover {
+    text-underline-offset: 0.08em;
+  }
+
+  .contact__alt {
+    margin-top: 20px;
+    color: var(--muted-on-ink);
+  }
+
+
+
+  @media (min-width: 900px) {
+    .contact__grid {
+      grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.4fr);
+      align-items: start;
+    }
+  }
+</style>

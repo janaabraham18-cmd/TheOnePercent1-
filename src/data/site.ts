@@ -18,7 +18,6 @@ export const site = {
     // Leave empty to hide. Format the href as wa.me/<number, no + or spaces>.
     whatsapp: '',
     whatsappLabel: '',
-    location: '',
   },
 
   // Formspree form id for the enquiry form (create a free form at formspree.io

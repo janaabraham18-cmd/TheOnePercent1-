@@ -6,3 +6,6 @@ export function hl(text: string, word: string): string {
   if (i === -1) return text;
   return `${text.slice(0, i)}<span class="serif">${word}</span>${text.slice(i + word.length)}`;
 }
+
+/** Two-digit numbering for lists: 1 → "01". */
+export const pad = (n: number) => String(n).padStart(2, '0');

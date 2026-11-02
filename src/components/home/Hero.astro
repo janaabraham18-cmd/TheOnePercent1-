@@ -1,0 +1,84 @@
+---
+// Hero: the TOP → TheOnePercent wordmark (it also anchors the pen line's
+// blueprint), the 99% / one percent headline and the two calls to action.
+import KineticWordmark from '../KineticWordmark.astro';
+import InkWord from '../InkWord.astro';
+import { site } from '../../data/site';
+---
+
+<section class="section hero">
+  <div class="wrap">
+    <p class="label">{site.kind}</p>
+    <KineticWordmark hero />
+    <div class="hero__foot">
+      <h1 class="hero__title" data-reveal>
+        <span class="hero__line">99% of websites blend in.</span>
+        <span class="hero__line">Be the <InkWord mark="swoosh">one percent</InkWord> that stands out.</span>
+      </h1>
+      <div class="hero__side" data-reveal style="--reveal-delay: 0.1s">
+        <p class="hero__lede">
+          Most websites are built from the same templates, filled with the same stock photos, and start to look
+          dated the day they launch. We design brands, build websites and bring them to life with motion, so yours
+          looks like nobody else’s and keeps looking good long after launch.
+        </p>
+        <div class="hero__actions">
+          <a class="btn" href="#contact">Start a project <span class="btn__arrow" aria-hidden="true">→</span></a>
+          <a class="btn btn--ghost" href="#work">See the work</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero {
+    padding-block: clamp(40px, 7vw, 120px) clamp(72px, 10vw, 160px);
+  }
+
+  .hero__foot {
+    display: grid;
+    gap: 28px clamp(40px, 6vw, 112px);
+    margin-top: clamp(32px, 5vw, 72px);
+    padding-top: clamp(24px, 3vw, 40px);
+    border-top: 1px solid var(--ink);
+  }
+
+  .hero__line {
+    display: block;
+  }
+
+  .hero__title {
+    max-width: 18ch;
+    font-size: clamp(2.25rem, 1.3rem + 3.6vw, 5.25rem);
+    line-height: 0.98;
+  }
+
+  .hero__side {
+    display: grid;
+    gap: 28px;
+    align-content: start;
+  }
+
+  .hero__lede {
+    max-width: 46ch;
+    font-size: clamp(1.05rem, 0.95rem + 0.35vw, 1.25rem);
+    color: var(--ink-soft);
+  }
+
+  .hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  @media (min-width: 1000px) {
+    .hero__foot {
+      grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+      align-items: start;
+    }
+
+    .hero__side {
+      padding-top: 0.5em;
+    }
+  }
+</style>

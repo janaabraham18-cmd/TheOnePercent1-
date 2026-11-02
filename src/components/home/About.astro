@@ -1,15 +1,15 @@
 ---
-// About: a full-width manifesto that fills in word by word as you scroll,
+// 06 About: a full-width manifesto that fills in word by word as you scroll,
 // four big honest numbers (the 1 in gold) that count up, and a call to
 // action. With reduced motion, or without JS, everything simply shows.
-import InkWord from './InkWord.astro';
-import { manifesto, aboutStats, aboutClose } from '../data/about';
+import InkWord from '../InkWord.astro';
+import { manifesto, aboutStats, aboutClose } from '../../data/about';
 
 const before = manifesto.before.split(' ');
 const after = manifesto.after.split(' ');
 ---
 
-<section class="about" id="about" aria-labelledby="about-title">
+<section class="section about" id="about" aria-labelledby="about-title">
   <div class="wrap">
     <p class="label"><span class="label__num">06</span> About</p>
 
@@ -90,10 +90,7 @@ const after = manifesto.after.split(' ');
 </script>
 
 <style>
-  /* Same rhythm as the page's other sections (their padding is scoped to
-     index.astro, so it's repeated here). */
   .about {
-    padding-block: clamp(80px, 11vw, 168px);
     border-top: 1px solid var(--line);
   }
 

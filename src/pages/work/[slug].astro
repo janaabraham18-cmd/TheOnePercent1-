@@ -118,7 +118,7 @@ const og = await getImage({ src: p.cover.src, width: 1200, format: 'jpg' });
 
     <nav class="cs-next" aria-label="Next project">
       <div class="wrap">
-        <a class="cs-next__link mono-trigger" href={`/work/${next.slug}`}>
+        <a class="cs-next__link" href={`/work/${next.slug}`}>
           <span class="label">Next project</span>
           <span class="cs-next__title" set:html={hl(next.client, next.accent)} />
           <span class="cs-next__arrow" aria-hidden="true">→</span>

@@ -1,0 +1,75 @@
+---
+// 05 Process: four steps. The pen line draws a shape on each one, and on
+// desktop a golden-ratio construction fills the extra space under them.
+import InkWord from '../InkWord.astro';
+import { process } from '../../data/services';
+import { pad } from '../../utils/text';
+---
+
+<section class="section process" id="process" aria-labelledby="process-title">
+  <div class="wrap">
+    <header class="section-head">
+      <p class="label"><span class="label__num">05</span> Process</p>
+      <h2 id="process-title" class="section-title" data-reveal>How a project <InkWord mark="swoosh">runs</InkWord>.</h2>
+    </header>
+    <ol class="process__steps">
+      {process.map((step, i) => (
+        <li class="step" data-reveal style={`--reveal-delay: ${i * 0.06}s`}>
+          <p class="step__num">{pad(i + 1)}</p>
+          <h3 class="step__title">{step.title}</h3>
+          <p>{step.body}</p>
+        </li>
+      ))}
+    </ol>
+  </div>
+</section>
+
+<style>
+  /* Room under the steps for the golden-ratio construction (desktop). */
+  @media (min-width: 900px) {
+    .process {
+      padding-bottom: clamp(260px, 26vw, 400px);
+    }
+  }
+
+  .process__steps {
+    display: grid;
+    gap: 0 clamp(24px, 3vw, 48px);
+    counter-reset: step;
+  }
+
+  .step {
+    padding: 28px 0 40px;
+    border-top: 1px solid var(--ink);
+  }
+
+  .step__num {
+    margin-bottom: clamp(24px, 4vw, 64px);
+    font-size: clamp(3rem, 2rem + 3vw, 5.5rem);
+    font-weight: 300;
+    font-variation-settings: 'wdth' 75;
+    letter-spacing: -0.04em;
+    line-height: 1;
+  }
+
+  .step__title {
+    margin-bottom: 12px;
+    font-size: clamp(1.5rem, 1.3rem + 0.8vw, 2rem);
+  }
+
+  .step p:last-child {
+    color: var(--ink-soft);
+  }
+
+  @media (min-width: 700px) {
+    .process__steps {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 1100px) {
+    .process__steps {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+</style>

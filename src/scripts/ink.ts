@@ -594,6 +594,25 @@ const rebuild = () => {
 // The "O" construction waits for TOP to finish stretching (or shows at once
 // when there's no animation).
 const kwEl = $('[data-kw-hero]');
+
+// The home route is drawn around these elements. If one gets renamed, the
+// line silently skips that part of the page, so say so in the console.
+// (The layout checks in tests/ fail on any "[ink]" warning.)
+const HOME_ROUTE_NEEDS = [
+  '.site-header', '.hero', '.hero__foot', '.hero [data-mark]',
+  '.ninety-nine [data-mark]', '.dots__dot--one', '.compare', '.compare__row', '.compare__us',
+  '#work [data-mark]', '.work-item__media', '#services [data-mark]', '.service',
+  '.details [data-mark]', '.details__grid',
+  '#process [data-mark]', '#process .wrap', '.step', '.step__num',
+  '#about [data-mark]', '#contact [data-mark]',
+  '.site-footer__mark .kw__mark',
+];
+if (kwEl) {
+  for (const sel of HOME_ROUTE_NEEDS) {
+    if (!document.querySelector(sel)) console.warn(`[ink] The pen line can't find "${sel}" on this page, so it skips that part of the route. Was it renamed? (src/scripts/ink.ts)`);
+  }
+}
+
 if (!kwEl || !kwEl.classList.contains('is-ready') || kwEl.dataset.done !== undefined) kwDoneAt = loadedAt - 1000;
 window.addEventListener('kw:done', (e) => {
   // Any wordmark finishing changes the layout the line is drawn around; only

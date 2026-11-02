@@ -1,0 +1,78 @@
+---
+// 04 The one percent: the details most studios skip.
+import InkWord from '../InkWord.astro';
+import { details } from '../../data/services';
+---
+
+<section class="section details on-ink" aria-labelledby="details-title">
+  <div class="wrap">
+    <header class="section-head">
+      <p class="label"><span class="label__num">04</span> The one percent</p>
+      <h2 id="details-title" class="section-title" data-reveal>
+        The details most studios <InkWord mark="zigzag">skip</InkWord>.
+      </h2>
+    </header>
+    <ol class="details__grid">
+      {details.map((d, i) => (
+        <li class="detail" data-reveal style={`--reveal-delay: ${(i % 3) * 0.06}s`}>
+          <span class="detail__pct" aria-hidden="true">1%</span>
+          <h3 class="detail__title">{d.title}</h3>
+          <p>{d.body}</p>
+        </li>
+      ))}
+    </ol>
+  </div>
+</section>
+
+<style>
+  .details__grid {
+    display: grid;
+    gap: 1px;
+    background: var(--line-on-ink);
+    border-block: 1px solid var(--line-on-ink);
+  }
+
+  .detail {
+    padding: clamp(28px, 3vw, 44px) clamp(0px, 2vw, 32px) clamp(32px, 3.5vw, 52px);
+    background: var(--ink);
+  }
+
+  .detail__pct {
+    display: inline-block;
+    margin-bottom: 28px;
+    padding: 3px 7px 2px;
+    border: 1px solid var(--gold-bright);
+    border-radius: 4px;
+    color: var(--gold-bright);
+    font-size: 0.75rem;
+    font-weight: 640;
+    font-variation-settings: 'wdth' 82;
+  }
+
+  .detail__title {
+    margin-bottom: 14px;
+    font-size: clamp(1.5rem, 1.25rem + 0.9vw, 2.1rem);
+    line-height: 1.05;
+  }
+
+  .detail p {
+    max-width: 40ch;
+    color: var(--muted-on-ink);
+  }
+
+  @media (min-width: 700px) {
+    .details__grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .detail {
+      padding-inline: clamp(20px, 2.5vw, 40px);
+    }
+  }
+
+  @media (min-width: 1100px) {
+    .details__grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+</style>

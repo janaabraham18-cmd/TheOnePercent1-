@@ -248,17 +248,34 @@ ol {
   transform: translateX(3px);
 }
 
-/* Photos are black and white until you point at them. */
-.mono {
-  filter: grayscale(1) contrast(1.05);
-  transition: filter 0.6s var(--ease-out);
+/* Home page sections (src/components/home/) share one rhythm and heading scale. */
+.section {
+  padding-block: clamp(80px, 11vw, 168px);
 }
 
-@media (hover: hover) {
-  .mono-trigger:hover .mono,
-  .mono-trigger:focus-visible .mono {
-    filter: none;
+.section-head {
+  margin-bottom: clamp(48px, 7vw, 104px);
+}
+
+.section-head--split {
+  display: grid;
+  gap: 24px 64px;
+  align-items: end;
+}
+
+@media (min-width: 900px) {
+  .section-head--split {
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
   }
+}
+
+.section-title {
+  font-size: clamp(2.5rem, 1.6rem + 4.4vw, 6.5rem);
+}
+
+.section-intro {
+  max-width: 44ch;
+  color: var(--muted);
 }
 
 /* Scroll reveal. Content is visible by default; the script only adds

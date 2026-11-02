@@ -1,0 +1,138 @@
+---
+// 02 Selected work: each client's logo on a light panel, linking to its case study.
+import ClientLogo from '../ClientLogo.astro';
+import InkWord from '../InkWord.astro';
+import { projects } from '../../data/work';
+import { hl, pad } from '../../utils/text';
+---
+
+<section class="section work on-ink" id="work" aria-labelledby="work-title">
+  <div class="wrap">
+    <header class="section-head">
+      <p class="label"><span class="label__num">02</span> Selected work</p>
+      <h2 id="work-title" class="section-title" data-reveal>Work we’re <InkWord mark="circle">proud</InkWord> of.</h2>
+    </header>
+
+    <ol class="work__list">
+      {projects.map((p, i) => (
+        <li class="work-item" data-reveal>
+          <a class="work-item__media" href={`/work/${p.slug}`} tabindex="-1" aria-hidden="true">
+            <ClientLogo id={p.logo} label={`${p.client} logo`} />
+          </a>
+          <div class="work-item__body">
+            <p class="work-item__meta">
+              <span>{pad(i + 1)}</span>
+              <span>{p.sector}</span>
+              <span>{p.location}</span>
+              <span>{p.year}</span>
+            </p>
+            <h3 class="work-item__title" set:html={hl(p.client, p.accent)} />
+            <p class="work-item__teaser">{p.teaser}</p>
+            <ul class="tags">
+              {p.services.map((s) => <li>{s}</li>)}
+            </ul>
+            <a class="btn btn--ghost" href={`/work/${p.slug}`}>
+              Read the case study <span class="btn__arrow" aria-hidden="true">→</span>
+            </a>
+          </div>
+        </li>
+      ))}
+    </ol>
+  </div>
+</section>
+
+<style>
+  .work__list {
+    display: grid;
+    gap: clamp(72px, 10vw, 152px);
+  }
+
+  .work-item {
+    display: grid;
+    gap: 28px;
+  }
+
+  .work-item__media {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    aspect-ratio: 4 / 3;
+    padding: 8%;
+    border-radius: 4px;
+    background: #f4f4f2;
+  }
+
+  .work-item__media > :global(*) {
+    transition: transform 0.9s var(--ease-out);
+  }
+
+  @media (hover: hover) {
+    .work-item:hover .work-item__media > :global(*) {
+      transform: scale(1.04);
+    }
+  }
+
+  .work-item__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 20px;
+    margin-bottom: 20px;
+    font-size: 0.8rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted-on-ink);
+  }
+
+  .work-item__meta span:first-child {
+    color: var(--paper);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .work-item__title {
+    font-size: clamp(2.25rem, 1.5rem + 3vw, 4.5rem);
+    margin-bottom: 20px;
+  }
+
+  .work-item__teaser {
+    max-width: 48ch;
+    margin-bottom: 24px;
+    color: var(--muted-on-ink);
+  }
+
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 32px;
+  }
+
+  .tags li {
+    padding: 6px 12px;
+    border: 1px solid var(--line-on-ink);
+    border-radius: 999px;
+    font-size: 0.8rem;
+  }
+
+  @media (min-width: 900px) {
+    .work-item {
+      grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+      gap: clamp(40px, 5vw, 96px);
+      align-items: start;
+    }
+
+    /* Mirror the layout on every other project, keeping the photo the
+       wider column both times. */
+    .work-item:nth-child(even) {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    }
+
+    .work-item:nth-child(even) .work-item__media {
+      order: 2;
+    }
+
+    .work-item__body {
+      padding-top: clamp(8px, 2vw, 40px);
+    }
+  }
+</style>

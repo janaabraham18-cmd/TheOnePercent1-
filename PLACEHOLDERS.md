@@ -8,7 +8,6 @@
 - [ ] **Domain**: `https://theonepercent1.com` in `astro.config.mjs` and `public/robots.txt` is a guess.
 - [ ] **WhatsApp / phone** (optional): fill `contact.whatsapp` + `whatsappLabel` in `site.ts` to show it.
 - [ ] **Instagram / LinkedIn** (optional): fill `social` in `site.ts`; empty links are hidden.
-- [ ] **Location** (optional): `contact.location` in `site.ts`; not shown anywhere yet.
 - [ ] **About**: the manifesto and the four numbers live in `src/data/about.ts`. They're
       written in a studio "we" voice; check each number is true for how you work (0 templates,
       7 screen sizes tested, 1 point of contact, 100% hand-built) and swap to "I" if you'd

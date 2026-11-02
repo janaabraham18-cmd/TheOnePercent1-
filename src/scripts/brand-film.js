@@ -25,7 +25,6 @@ const C = {
   hexGoldBright: '#d4b062',
 };
 const SANS = "'Archivo Variable', 'Helvetica Neue', Arial, sans-serif";
-const SERIF = "'Instrument Serif', 'Times New Roman', serif";
 
 const clamp01 = (n) => Math.min(1, Math.max(0, n));
 const seg = (t, a, b) => clamp01((t - a) / (b - a));
@@ -58,7 +57,6 @@ const settle = bezier(0.22, 1, 0.36, 1);
 const stretch = bezier(0.65, 0, 0.35, 1);
 const land = bezier(0.34, 1.56, 0.64, 1);
 const slam = bezier(0.2, 1.45, 0.35, 1);
-const snap = bezier(0.85, 0, 0.15, 1);
 const fall = bezier(0.55, 0, 1, 0.45);
 const whipIn = bezier(0.15, 0.85, 0.3, 1);
 const whipOut = bezier(0.7, 0, 0.85, 0.3);

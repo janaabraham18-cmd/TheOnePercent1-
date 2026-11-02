@@ -419,10 +419,11 @@ function build() {
     const n = 9;
     for (let i = 0; i < n; i++) {
       const k = i - (n - 1) / 2;
-      const y0 = S.y + S.h * 0.18 + k * 12;
-      const y3 = S.y + S.h * 0.92 + k * 9;
-      const c1 = { x: W * 0.6, y: S.y + S.h * 0.02 + k * 30 };
-      const c2 = { x: W * 0.32, y: S.y + S.h * 1.02 - k * 22 };
+      // Fans open in the middle and gathers at the ends, like a twisting ribbon.
+      const y0 = S.y + S.h * 0.16 + k * 16;
+      const y3 = S.y + S.h * 0.94 + k * 12;
+      const c1 = { x: W * (0.62 + k * 0.02), y: S.y + S.h * 0.0 + k * 58 };
+      const c2 = { x: W * (0.3 - k * 0.02), y: S.y + S.h * 1.05 - k * 46 };
       const el = stroke(
         `M ${f(W + 20)} ${f(y0)} C ${f(c1.x)} ${f(c1.y)}, ${f(c2.x)} ${f(c2.y)}, ${f(-20)} ${f(y3)}`,
         gArt,

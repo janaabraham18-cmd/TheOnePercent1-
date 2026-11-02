@@ -26,15 +26,17 @@ Astro (static). `npm run build` runs `astro check` before building.
   - **Pen line:** a designed route, not a wander. Home: down beside the hero wordmark, along
     the hero hairline, into each accent word's mark, round the one black dot, down the middle
     of the 99%/1% comparison, beside each logo panel, along the services row and the details
-    grid, as the process timeline (vine), and round the footer "1%". Other pages: through each
+    grid, as the process timeline, and round the footer "1%". Other pages: through each
     `[data-mark]` word. Scroll moves the pen; sideways runs take extra scroll. On phones the
     line hugs the page edges and only crosses over just above headings.
   - **Hero blueprint:** 12-column guides plus cap-height / x-height / baseline lines measured
     from the real wordmark, drawn on load; a construction circle + square on the "O" once TOP
     finishes stretching (`kw:done` event from `KineticWordmark.astro`).
   - **Work (black):** a flowing ribbon of parallel lines and sun arcs, drawn as you scroll.
-  - **Process:** leaves sprout off the vine as the pen passes, a tendril curls at its end, and
-    a leafy branch fills the empty space bottom right (desktop).
+  - **Process (geometry):** the pen becomes a straight timeline through a shape on each step,
+    drawn as the pen passes: circle, triangle, square, hexagon (a project gaining structure).
+    A golden-ratio construction (golden rectangle, square divisions, spiral, guide circle and
+    diagonal) fills the empty space bottom right on desktop, drawn as you scroll.
 - **Marks on accent words.** h1/h2 accent words use `<InkWord mark="...">` (swoosh, double,
   zigzag, circle, strike) instead of a plain `.serif` span; the pen draws the mark when it
   reaches the word. Negative words get `strike` ("forgettable"). h3s stay plain `.serif`.

@@ -327,7 +327,7 @@ body {
 /* Section drawings. Every path uses pathLength=1, so a 1/1 dash draws it. */
 .ink-grid path,
 .ink-art path,
-.ink-leaves path {
+.ink-geo path {
   fill: none;
   stroke: #fff;
   stroke-linecap: round;
@@ -369,8 +369,23 @@ body {
   stroke-opacity: 0.26;
 }
 
-/* Process: leaves and branch, same weight as the line they grow from. */
-.ink-leaves path {
+/* Process: step shapes and the golden-ratio construction. */
+.ink-geo__node {
+  stroke-width: 1.4;
+  stroke-opacity: 0.6;
+}
+
+.ink-geo__frame {
+  stroke-width: 1;
+  stroke-opacity: 0.28;
+}
+
+.ink-geo__guide {
+  stroke-width: 1;
+  stroke-opacity: 0.18;
+}
+
+.ink-geo__spiral {
   stroke-width: 1.4;
   stroke-opacity: 0.55;
 }

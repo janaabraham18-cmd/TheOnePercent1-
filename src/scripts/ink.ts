@@ -7,8 +7,9 @@
 //    loops the footer "1%") and turns into the bold mark on each heading's
 //    accent word ([data-mark], InkWord.astro). Scrolling moves the pen.
 // 2. Section drawings: a blueprint grid with type construction lines in the
-//    hero, flowing ribbon lines and sun arcs in the work section, and leaves
-//    sprouting off the line (plus a leafy branch) in the process section.
+//    hero, flowing ribbon lines and sun arcs in the work section, and in the
+//    process section a shape on each timeline step (circle, triangle, square,
+//    hexagon) plus a golden-ratio construction in the empty corner.
 //
 // Everything is drawn white with mix-blend-mode: difference, so it reads
 // black over white sections and white over black ones. The layer sits at
@@ -22,7 +23,8 @@ type Rect = { x: number; y: number; w: number; h: number };
 type Anchor = { paths: SVGPathElement[]; i0: number; i1: number; l0: number; l1: number };
 /** A drawing that animates in over [a, b] of its group's 0–1 progress. */
 type Item = { el: SVGElement; a: number; b: number };
-type Leaf = { paths: SVGElement[]; at: number };
+/** A drawing that animates in as the pen passes length `at`. */
+type StepNode = { paths: SVGElement[]; at: number };
 
 function make<K extends keyof SVGElementTagNameMap>(tag: K, attrs: Record<string, string | number>, parent: Element) {
   const el = document.createElementNS(NS, tag);
@@ -36,7 +38,7 @@ svg.classList.add('ink-thread');
 svg.setAttribute('aria-hidden', 'true');
 const gGrid = make('g', { class: 'ink-grid' }, svg);
 const gArt = make('g', { class: 'ink-art' }, svg);
-const gLeaves = make('g', { class: 'ink-leaves' }, svg);
+const gGeo = make('g', { class: 'ink-geo' }, svg);
 const thread = make('path', { class: 'ink-thread__line' }, svg);
 const tip = make('circle', { class: 'ink-thread__tip', r: 3 }, svg);
 document.body.prepend(svg);
@@ -83,20 +85,17 @@ function setProgress(el: SVGElement, t: number) {
   else el.style.strokeDashoffset = String(1 - t);
 }
 
-// A single leaf in line drawing: stalk, blade, midrib and two veins.
-function leaf(at: Pt, angleDeg: number, L: number, parent: Element) {
-  const g = make('g', { transform: `translate(${f(at.x)} ${f(at.y)}) rotate(${f(angleDeg)})` }, parent);
-  const s = 7;
-  const w = L * 0.3;
-  return [
-    stroke(`M 0 0 L ${s} 0`, g),
-    stroke(
-      `M ${s} 0 C ${f(s + L * 0.25)} ${f(-w)}, ${f(s + L * 0.75)} ${f(-w)}, ${f(s + L)} 0 C ${f(s + L * 0.75)} ${f(w)}, ${f(s + L * 0.25)} ${f(w)}, ${s} 0`,
-      g,
-    ),
-    stroke(`M ${s} 0 L ${f(s + L * 0.86)} 0`, g),
-    stroke(`M ${f(s + L * 0.34)} 0 L ${f(s + L * 0.5)} ${f(-w * 0.62)} M ${f(s + L * 0.56)} 0 L ${f(s + L * 0.7)} ${f(w * 0.55)}`, g),
-  ];
+// A regular polygon (or circle, sides = 0) centred on c, as a closed path.
+function shape(c: Pt, r: number, sides: number) {
+  // Two half arcs: a single full-circle arc collapses to nothing once rounded.
+  if (!sides) return `M ${f(c.x)} ${f(c.y - r)} A ${f(r)} ${f(r)} 0 0 1 ${f(c.x)} ${f(c.y + r)} A ${f(r)} ${f(r)} 0 0 1 ${f(c.x)} ${f(c.y - r)}`;
+  const pts: string[] = [];
+  for (let i = 0; i < sides; i++) {
+    // Squares sit upright; everything else points up.
+    const a = -Math.PI / 2 + (sides === 4 ? Math.PI / 4 : 0) + (i / sides) * Math.PI * 2;
+    pts.push(`${f(c.x + Math.cos(a) * r)} ${f(c.y + Math.sin(a) * r)}`);
+  }
+  return `M ${pts.join(' L ')} Z`;
 }
 
 const loadedAt = performance.now();
@@ -109,9 +108,9 @@ let gridItems: Item[] = [];
 let oItems: Item[] = [];
 let artItems: Item[] = [];
 let art = { top: 0, span: 1 };
-let branchItems: Item[] = [];
-let branch = { top: 0, span: 1 };
-let leaves: Leaf[] = [];
+let geoItems: Item[] = [];
+let geo = { top: 0, span: 1 };
+let nodes: StepNode[] = [];
 let introTarget = 0;
 let intro = reduce ? Infinity : 0;
 
@@ -124,18 +123,19 @@ function build() {
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
   gGrid.replaceChildren();
   gArt.replaceChildren();
-  gLeaves.replaceChildren();
+  gGeo.replaceChildren();
   gridItems = [];
   oItems = [];
   artItems = [];
-  branchItems = [];
-  leaves = [];
+  geoItems = [];
+  nodes = [];
 
   const pts: Pt[] = [];
   const P = (x: number, y: number) => pts.push({ x, y });
   const last = () => pts[pts.length - 1];
   const found: Omit<Anchor, 'l0' | 'l1'>[] = [];
-  let vine: [number, number] | null = null;
+  // The process timeline: where it starts, and which way it runs.
+  let timeline: { i: number; x: number; y: number; across: boolean } | null = null;
 
   // A deliberate S-curve from the last point to Q, bowing towards sideFrac
   // of the page width. No randomness: the same page always draws the same.
@@ -267,22 +267,26 @@ function build() {
       P(G.x + G.w + 4, G.y - 14);
     }
 
-    // Process: swoosh "runs", then the line becomes the timeline, as a vine.
+    // Process: swoosh "runs", then the line becomes a straight timeline
+    // through a shape on each step.
     markInto(markIn('#process'), 0.9);
     const steps = $$('.step').map(rect);
     if (steps.length) {
-      const oneRow = steps.every((s) => Math.abs(s.y - steps[0].y) < 4);
-      const vStart = pts.length;
-      if (oneRow) {
-        const vy = steps[0].y - 14;
-        P(steps[0].x - 10, vy);
-        steps.forEach((s, i) => P(s.x + s.w * (i === steps.length - 1 ? 1 : 0.5), vy + (i % 2 ? 3 : -3)));
+      const across = steps.every((s) => Math.abs(s.y - steps[0].y) < 4);
+      const lastStep = steps[steps.length - 1];
+      if (across) {
+        const ty = steps[0].y - 18;
+        P(steps[0].x - 12, ty);
+        timeline = { i: pts.length - 1, x: steps[0].x - 12, y: ty, across };
+        steps.forEach((s) => P(s.x + s.w * 0.5, ty));
+        P(lastStep.x + lastStep.w, ty);
       } else {
         const gx = Math.max(6, steps[0].x - Math.min(30, steps[0].x / 2));
         P(gx, steps[0].y - 10);
-        P(gx, steps[steps.length - 1].y + steps[steps.length - 1].h);
+        timeline = { i: pts.length - 1, x: gx, y: steps[0].y - 10, across };
+        steps.forEach((s) => P(gx, s.y + s.h * 0.5));
+        P(gx, lastStep.y + lastStep.h);
       }
-      vine = [vStart, pts.length - 1];
     }
 
     // About and contact.
@@ -394,8 +398,7 @@ function build() {
         const cx = O.x + O.w / 2;
         const cy = base - capH / 2;
         const r = capH * 0.56;
-        const circle = `M ${f(cx)} ${f(cy - r)} A ${f(r)} ${f(r)} 0 1 1 ${f(cx - 0.01)} ${f(cy - r)}`;
-        oItems.push({ el: stroke(circle, gGrid, 'ink-grid__o'), a: 0, b: 0.7 });
+        oItems.push({ el: stroke(shape({ x: cx, y: cy }, r, 0), gGrid, 'ink-grid__o'), a: 0, b: 0.7 });
         const sq = `M ${f(cx - r)} ${f(cy - r)} H ${f(cx + r)} V ${f(cy + r)} H ${f(cx - r)} Z`;
         oItems.push({ el: stroke(sq, gGrid, 'ink-grid__type'), a: 0.2, b: 0.9 });
         const cross = `M ${f(cx - r * 1.5)} ${f(cy)} H ${f(cx + r * 1.5)} M ${f(cx)} ${f(cy - r * 1.5)} V ${f(cy + r * 1.5)}`;
@@ -433,60 +436,76 @@ function build() {
     }
   }
 
-  // ---------- Process: leaves off the vine, and a leafy branch ----------
-  if (vine) {
-    const l0 = lens[vine[0]];
-    const l1 = lens[vine[1]];
-    const gap = narrow ? 64 : 92;
-    const count = Math.floor((l1 - l0) / gap);
-    const sizes = [38, 30, 44, 34];
-    for (let k = 1; k <= count; k++) {
-      const at = l0 + k * gap - gap / 2;
-      const p = thread.getPointAtLength(at);
-      const q = thread.getPointAtLength(Math.min(total, at + 2));
-      const side = k % 2 ? -1 : 1;
-      const ang = (Math.atan2(q.y - p.y, q.x - p.x) * 180) / Math.PI + side * 50;
-      leaves.push({ paths: leaf(p, ang, sizes[k % 4] * (narrow ? 0.8 : 1), gLeaves), at });
-    }
-    // A curling tendril where the vine ends.
-    const end = thread.getPointAtLength(l1);
-    const tendril: string[] = [`M ${f(end.x)} ${f(end.y)}`];
-    for (let s = 1; s <= 24; s++) {
-      const t = s / 24;
-      const ang = -Math.PI / 2 + t * Math.PI * 3.2;
-      const r = 26 * (1 - t * 0.8);
-      tendril.push(`L ${f(end.x + 16 + Math.cos(ang) * r)} ${f(end.y - 22 + Math.sin(ang) * r + 10 * (1 - t))}`);
-    }
-    leaves.push({ paths: [stroke(tendril.join(' '), gLeaves)], at: l1 - 30 });
+  // ---------- Process: a shape on each step, and a golden-ratio construction ----------
+  if (timeline) {
+    // Circle, triangle, square, hexagon: the project gaining structure.
+    const sides = [0, 3, 4, 6];
+    const r = narrow ? 6 : 15;
+    const tl = timeline;
+    const l0 = lens[tl.i];
+    $$('.step').forEach((el, i) => {
+      const s = rect(el);
+      const c = tl.across ? { x: s.x + r + 2, y: tl.y } : { x: tl.x, y: s.y + r + 6 };
+      const at = l0 + (tl.across ? c.x - tl.x : c.y - tl.y) - r;
+      const paths: SVGElement[] = [stroke(shape(c, r, sides[i % sides.length]), gGeo, 'ink-geo__node')];
+      // A small centre point, like a compass mark.
+      paths.push(stroke(shape(c, 1.6, 0), gGeo, 'ink-geo__node'));
+      nodes.push({ paths, at });
+    });
 
-    // A larger leafy branch in the bottom-right corner of the section.
+    // Golden-ratio construction in the empty space under the steps (desktop).
     const proc = $('#process');
     const procWrap = $('#process .wrap');
     if (proc && procWrap && W >= 900) {
       const R = rect(proc);
-      branch = { top: R.y, span: R.h * 0.9 };
-      // Fit it in the empty space under the steps, at the right edge.
-      const below = R.y + R.h - Math.max(...$$('.step').map((el) => { const s = rect(el); return s.y + s.h; }));
-      const h = Math.max(110, Math.min(240, below - 10));
-      const k = h / 250;
-      const bx = W - Math.max(40, (W - procWrap.offsetWidth) / 2 + 30);
-      const by = R.y + R.h - 16;
-      const stem = `M ${f(bx)} ${f(by)} C ${f(bx - 30 * k)} ${f(by - 80 * k)}, ${f(bx - 10 * k)} ${f(by - 170 * k)}, ${f(bx - 70 * k)} ${f(by - 250 * k)}`;
-      branchItems.push({ el: stroke(stem, gLeaves), a: 0, b: 0.5 });
-      const stemPath = make('path', { d: stem }, gLeaves);
-      const sl = stemPath.getTotalLength();
-      [0.18, 0.34, 0.5, 0.66, 0.82].forEach((t, i) => {
-        const p = stemPath.getPointAtLength(sl * t);
-        const q = stemPath.getPointAtLength(sl * t + 2);
-        const base = (Math.atan2(q.y - p.y, q.x - p.x) * 180) / Math.PI;
-        [-1, 1].forEach((side, j) => {
-          leaf(p, base + side * 48, (46 - i * 5) * Math.max(0.7, k), gLeaves).forEach((el, m) => {
-            const a = 0.12 + t * 0.55 + j * 0.04 + m * 0.02;
-            branchItems.push({ el, a, b: a + 0.18 });
-          });
-        });
-      });
-      stemPath.remove();
+      geo = { top: R.y, span: R.h * 0.95 };
+      const stepsBottom = Math.max(...$$('.step').map((el) => { const s = rect(el); return s.y + s.h; }));
+      const h = Math.max(110, Math.min(230, R.y + R.h - stepsBottom - 40));
+      const phi = (1 + Math.sqrt(5)) / 2;
+      const w = h * phi;
+      const right = W - Math.max(40, (W - procWrap.offsetWidth) / 2 + 30);
+      let box = { x: right - w, y: R.y + R.h - 24 - h, w, h };
+      const outer = { ...box };
+
+      const frame = `M ${f(box.x)} ${f(box.y)} H ${f(box.x + w)} V ${f(box.y + h)} H ${f(box.x)} Z`;
+      geoItems.push({ el: stroke(frame, gGeo, 'ink-geo__frame'), a: 0, b: 0.3 });
+      const diag = `M ${f(box.x)} ${f(box.y + h)} L ${f(box.x + w)} ${f(box.y)}`;
+      geoItems.push({ el: stroke(diag, gGeo, 'ink-geo__guide'), a: 0.15, b: 0.4 });
+
+      // Cut squares off left, top, right, bottom in turn; a quarter arc in
+      // each square makes the spiral.
+      let spiral = `M ${f(box.x)} ${f(box.y + box.h)}`;
+      for (let i = 0; i < 8; i++) {
+        const dir = i % 4;
+        let cut = '';
+        if (dir === 0) {
+          const q = box.h;
+          cut = `M ${f(box.x + q)} ${f(box.y)} V ${f(box.y + box.h)}`;
+          spiral += ` A ${f(q)} ${f(q)} 0 0 1 ${f(box.x + q)} ${f(box.y)}`;
+          box = { x: box.x + q, y: box.y, w: box.w - q, h: box.h };
+        } else if (dir === 1) {
+          const q = box.w;
+          cut = `M ${f(box.x)} ${f(box.y + q)} H ${f(box.x + box.w)}`;
+          spiral += ` A ${f(q)} ${f(q)} 0 0 1 ${f(box.x + q)} ${f(box.y + q)}`;
+          box = { x: box.x, y: box.y + q, w: box.w, h: box.h - q };
+        } else if (dir === 2) {
+          const q = box.h;
+          cut = `M ${f(box.x + box.w - q)} ${f(box.y)} V ${f(box.y + box.h)}`;
+          spiral += ` A ${f(q)} ${f(q)} 0 0 1 ${f(box.x + box.w - q)} ${f(box.y + q)}`;
+          box = { x: box.x, y: box.y, w: box.w - q, h: box.h };
+        } else {
+          const q = box.w;
+          cut = `M ${f(box.x)} ${f(box.y + box.h - q)} H ${f(box.x + box.w)}`;
+          spiral += ` A ${f(q)} ${f(q)} 0 0 1 ${f(box.x)} ${f(box.y + box.h - q)}`;
+          box = { x: box.x, y: box.y, w: box.w, h: box.h - q };
+        }
+        geoItems.push({ el: stroke(cut, gGeo, 'ink-geo__frame'), a: 0.25 + i * 0.05, b: 0.4 + i * 0.05 });
+      }
+      geoItems.push({ el: stroke(spiral, gGeo, 'ink-geo__spiral'), a: 0.55, b: 0.95 });
+
+      // A guide circle inscribed in the first square.
+      const c0 = { x: outer.x + outer.h / 2, y: outer.y + outer.h / 2 };
+      geoItems.push({ el: stroke(shape(c0, outer.h / 2, 0), gGeo, 'ink-geo__guide'), a: 0.35, b: 0.7 });
     }
   }
 }
@@ -530,11 +549,11 @@ function render() {
   drawItems(gridItems, reduce ? 1 : (now - loadedAt - 150) / 1700);
   drawItems(oItems, reduce ? 1 : kwDoneAt ? (now - kwDoneAt) / 900 : 0);
   drawItems(artItems, reduce ? 1 : (penY - art.top) / art.span);
-  drawItems(branchItems, reduce ? 1 : (penY - branch.top) / branch.span);
-  for (const l of leaves) {
-    const t = reduce ? 1 : clamp01((drawn - l.at) / 140);
-    const n = l.paths.length;
-    l.paths.forEach((p, i) => setProgress(p, clamp01(t * n - i)));
+  drawItems(geoItems, reduce ? 1 : (penY - geo.top) / geo.span);
+  for (const node of nodes) {
+    const t = reduce ? 1 : clamp01((drawn - node.at) / 60);
+    const n = node.paths.length;
+    node.paths.forEach((p, i) => setProgress(p, clamp01(t * n - i)));
   }
 }
 

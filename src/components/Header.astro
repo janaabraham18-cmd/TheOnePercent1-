@@ -1,0 +1,230 @@
+---
+import Wordmark from './Wordmark.astro';
+import { site, nav } from '../data/site';
+---
+
+<header class="site-header" data-header>
+  <div class="site-header__inner wrap">
+    <a class="site-header__logo" href="/" aria-label={`${site.name} home`}>
+      <Wordmark />
+    </a>
+
+    <nav class="site-header__nav" aria-label="Main">
+      <ul>
+        {nav.map((item) => (
+          <li><a href={item.href}>{item.label}</a></li>
+        ))}
+      </ul>
+      <a class="btn site-header__cta" href="/#contact">Start a project</a>
+    </nav>
+
+    <button
+      class="site-header__toggle"
+      type="button"
+      aria-expanded="false"
+      aria-controls="mobile-menu"
+      data-menu-toggle
+    >
+      <span class="visually-hidden">Menu</span>
+      <span class="site-header__bars" aria-hidden="true"><span></span><span></span></span>
+    </button>
+  </div>
+
+  <div class="mobile-menu on-ink" id="mobile-menu" hidden data-menu>
+    <nav class="wrap" aria-label="Main (mobile)">
+      <ul>
+        {nav.map((item) => (
+          <li><a href={item.href} data-menu-link>{item.label}</a></li>
+        ))}
+        <li><a href="/#contact" data-menu-link>Contact</a></li>
+      </ul>
+      <a class="btn" href="/#contact" data-menu-link>Start a project <span class="btn__arrow" aria-hidden="true">→</span></a>
+    </nav>
+  </div>
+</header>
+
+<script>
+  const header = document.querySelector<HTMLElement>('[data-header]');
+  const toggle = document.querySelector<HTMLButtonElement>('[data-menu-toggle]');
+  const menu = document.querySelector<HTMLElement>('[data-menu]');
+
+  const setOpen = (open: boolean) => {
+    if (!toggle || !menu) return;
+    toggle.setAttribute('aria-expanded', String(open));
+    menu.hidden = !open;
+    document.documentElement.classList.toggle('menu-open', open);
+  };
+
+  toggle?.addEventListener('click', () => setOpen(toggle.getAttribute('aria-expanded') !== 'true'));
+  menu?.querySelectorAll('[data-menu-link]').forEach((a) => a.addEventListener('click', () => setOpen(false)));
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') setOpen(false);
+  });
+  // Close the menu if the window is widened past the desktop breakpoint.
+  matchMedia('(min-width: 960px)').addEventListener('change', (e) => e.matches && setOpen(false));
+
+  const onScroll = () => header?.classList.toggle('is-scrolled', window.scrollY > 8);
+  onScroll();
+  window.addEventListener('scroll', onScroll, { passive: true });
+</script>
+
+<style>
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.3s var(--ease-out);
+  }
+
+  .site-header.is-scrolled {
+    border-bottom-color: var(--line);
+  }
+
+  .site-header__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    height: var(--header-h);
+  }
+
+  .site-header__logo {
+    color: var(--ink);
+    text-decoration: none;
+    flex-shrink: 0;
+  }
+
+  .site-header__nav {
+    display: none;
+    align-items: center;
+    gap: clamp(24px, 3vw, 40px);
+  }
+
+  .site-header__nav ul {
+    display: flex;
+    gap: clamp(20px, 2.4vw, 36px);
+  }
+
+  .site-header__nav ul a {
+    position: relative;
+    font-size: 0.95rem;
+    font-weight: 500;
+    text-decoration: none;
+  }
+
+  .site-header__nav ul a::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -4px;
+    height: 1px;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.35s var(--ease-out);
+  }
+
+  .site-header__nav ul a:hover::after {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+
+  .site-header__cta {
+    min-height: 42px;
+    padding: 0 20px;
+  }
+
+  .site-header__toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    margin-right: -12px;
+    border: 0;
+    background: none;
+    color: var(--ink);
+    cursor: pointer;
+  }
+
+  .site-header__bars {
+    position: relative;
+    display: block;
+    width: 24px;
+    height: 10px;
+  }
+
+  .site-header__bars span {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: currentColor;
+    transition: transform 0.3s var(--ease-out), top 0.3s var(--ease-out);
+  }
+
+  .site-header__bars span:first-child {
+    top: 0;
+  }
+
+  .site-header__bars span:last-child {
+    top: 8px;
+  }
+
+  [aria-expanded='true'] .site-header__bars span:first-child {
+    top: 4px;
+    transform: rotate(45deg);
+  }
+
+  [aria-expanded='true'] .site-header__bars span:last-child {
+    top: 4px;
+    transform: rotate(-45deg);
+  }
+
+  .mobile-menu {
+    position: fixed;
+    inset: var(--header-h) 0 0;
+    overflow-y: auto;
+    padding: 32px 0 48px;
+  }
+
+  .mobile-menu ul {
+    margin-bottom: 40px;
+  }
+
+  .mobile-menu li + li {
+    border-top: 1px solid var(--line-on-ink);
+  }
+
+  .mobile-menu ul a {
+    display: block;
+    padding: 18px 0;
+    font-size: clamp(2rem, 9vw, 3rem);
+    font-weight: 640;
+    font-variation-settings: 'wdth' 82;
+    letter-spacing: -0.035em;
+    line-height: 1;
+    text-decoration: none;
+  }
+
+  :global(html.menu-open) {
+    overflow: hidden;
+  }
+
+  /* Logo (161px) + nav (480px max) + gap measure ~665px, plus gutters.
+     960px leaves plenty of margin. Re-measure if links are added. */
+  @media (min-width: 960px) {
+    .site-header__nav {
+      display: flex;
+    }
+
+    .site-header__toggle {
+      display: none;
+    }
+  }
+</style>

@@ -1,0 +1,614 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import { site } from '../data/site';
+import { services, details, process } from '../data/services';
+import { projects } from '../data/work';
+import { hl } from '../utils/text';
+
+const pad = (n: number) => String(n).padStart(2, '0');
+---
+
+<Base>
+  <!-- Hero -->
+  <section class="hero">
+    <div class="wrap">
+      <p class="label" data-reveal>{site.kind}</p>
+      <h1 class="hero__title" data-reveal style="--reveal-delay: 0.05s">
+        The <span class="serif">one percent</span> is in the details.
+      </h1>
+      <div class="hero__foot" data-reveal style="--reveal-delay: 0.15s">
+        <p class="hero__lede">
+          We design brand identities and build websites for businesses that want to stand out. Most of a brand is the
+          same as everyone else’s. We work on the part that isn’t.
+        </p>
+        <div class="hero__actions">
+          <a class="btn" href="#contact">Start a project <span class="btn__arrow" aria-hidden="true">→</span></a>
+          <a class="btn btn--ghost" href="#work">See the work</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Work -->
+  <section class="work on-ink" id="work" aria-labelledby="work-title">
+    <div class="wrap">
+      <header class="section-head">
+        <p class="label"><span class="label__num">01</span> Selected work</p>
+        <h2 id="work-title" class="section-title" data-reveal>Work we’re <span class="serif">proud</span> of.</h2>
+      </header>
+
+      <ol class="work__list">
+        {projects.map((p, i) => (
+          <li class="work-item" data-reveal>
+            <a class="work-item__media mono-trigger" href={`/work/${p.slug}`} tabindex="-1" aria-hidden="true">
+              <Image
+                class="mono"
+                src={p.cover.src}
+                alt=""
+                widths={[640, 960, 1280, 1600]}
+                sizes="(min-width: 1440px) 800px, (min-width: 900px) 58vw, 100vw"
+                loading={i === 0 ? 'eager' : 'lazy'}
+              />
+            </a>
+            <div class="work-item__body">
+              <p class="work-item__meta">
+                <span>{pad(i + 1)}</span>
+                <span>{p.sector}</span>
+                <span>{p.location}</span>
+                <span>{p.year}</span>
+              </p>
+              <h3 class="work-item__title" set:html={hl(p.client, p.accent)} />
+              <p class="work-item__teaser">{p.teaser}</p>
+              <ul class="tags">
+                {p.services.map((s) => <li>{s}</li>)}
+              </ul>
+              <a class="btn btn--ghost" href={`/work/${p.slug}`}>
+                Read the case study <span class="btn__arrow" aria-hidden="true">→</span>
+              </a>
+            </div>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <!-- Services -->
+  <section class="services" id="services" aria-labelledby="services-title">
+    <div class="wrap">
+      <header class="section-head section-head--split">
+        <div>
+          <p class="label"><span class="label__num">02</span> Services</p>
+          <h2 id="services-title" class="section-title" data-reveal>What we <span class="serif">make</span>.</h2>
+        </div>
+        <p class="section-intro" data-reveal>
+          Every project is quoted on its own scope. Tell us what you need and we’ll come back with a clear, fixed price
+          before any work starts.
+        </p>
+      </header>
+
+      <div class="services__grid">
+        {services.map((s, i) => (
+          <article class="service" data-reveal style={`--reveal-delay: ${(i % 2) * 0.08}s`}>
+            <p class="service__num">{pad(i + 1)}</p>
+            <h3 class="service__title" set:html={hl(s.title, s.accent)} />
+            <p class="service__summary">{s.summary}</p>
+            <ul class="service__list">
+              {s.includes.map((item) => <li>{item}</li>)}
+            </ul>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- The one percent -->
+  <section class="details on-ink" aria-labelledby="details-title">
+    <div class="wrap">
+      <header class="section-head">
+        <p class="label"><span class="label__num">03</span> The one percent</p>
+        <h2 id="details-title" class="section-title" data-reveal>
+          The details most studios <span class="serif">skip</span>.
+        </h2>
+      </header>
+      <ol class="details__grid">
+        {details.map((d, i) => (
+          <li class="detail" data-reveal style={`--reveal-delay: ${(i % 3) * 0.06}s`}>
+            <span class="detail__pct" aria-hidden="true">1%</span>
+            <h3 class="detail__title">{d.title}</h3>
+            <p>{d.body}</p>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <!-- Process -->
+  <section class="process" id="process" aria-labelledby="process-title">
+    <div class="wrap">
+      <header class="section-head">
+        <p class="label"><span class="label__num">04</span> Process</p>
+        <h2 id="process-title" class="section-title" data-reveal>How a project <span class="serif">runs</span>.</h2>
+      </header>
+      <ol class="process__steps">
+        {process.map((step, i) => (
+          <li class="step" data-reveal style={`--reveal-delay: ${i * 0.06}s`}>
+            <p class="step__num">{pad(i + 1)}</p>
+            <h3 class="step__title">{step.title}</h3>
+            <p>{step.body}</p>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <!-- About -->
+  <section class="about" id="about" aria-labelledby="about-title">
+    <div class="wrap about__inner">
+      <div>
+        <p class="label"><span class="label__num">05</span> About</p>
+        <h2 id="about-title" class="section-title" data-reveal>
+          A small studio with <span class="serif">high</span> standards.
+        </h2>
+      </div>
+      <div class="about__copy" data-reveal>
+        <p class="about__lead">
+          The name comes from a simple idea: most of what makes a brand work is the same for everyone. The difference
+          is in the last one percent, the details people notice without knowing why.
+        </p>
+        <p>
+          That’s the part we care about most. The word in a heading that does the heavy lifting. The photo that’s
+          cropped so the subject breathes. The booking form that only offers times that actually work. The layout
+          that holds up on a phone in the sun and on the big screen in a boardroom.
+        </p>
+        <p>
+          We work directly with owners, so there are no account managers and nothing gets lost between you and the
+          person doing the work.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact -->
+  <section class="contact on-ink" id="contact" aria-labelledby="contact-title">
+    <div class="wrap">
+      <p class="label"><span class="label__num">06</span> Contact</p>
+      <h2 id="contact-title" class="contact__title" data-reveal>
+        Let’s build your <span class="serif">one percent</span>.
+      </h2>
+
+      <div class="contact__grid">
+        <div data-reveal>
+          <p class="contact__lede">Tell us about your business and what you need. We reply to every enquiry ourselves.</p>
+          <a class="contact__email" href={`mailto:${site.contact.email}?subject=New%20project`}>
+            {site.contact.email}
+          </a>
+          {site.contact.whatsapp && (
+            <p class="contact__alt">
+              Or WhatsApp us on <a href={site.contact.whatsapp}>{site.contact.whatsappLabel}</a>
+            </p>
+          )}
+        </div>
+        <div class="contact__help" data-reveal style="--reveal-delay: 0.08s">
+          <h3 class="contact__help-title">What helps us quote</h3>
+          <ul>
+            <li>What your business does and who your customers are</li>
+            <li>What you need: a brand, a website or both</li>
+            <li>Any deadline you’re working towards</li>
+            <li>A few websites or brands you like, and why</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  section {
+    padding-block: clamp(80px, 11vw, 168px);
+  }
+
+  .section-head {
+    margin-bottom: clamp(48px, 7vw, 104px);
+  }
+
+  .section-head--split {
+    display: grid;
+    gap: 24px 64px;
+    align-items: end;
+  }
+
+  @media (min-width: 900px) {
+    .section-head--split {
+      grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+    }
+  }
+
+  .section-title {
+    font-size: clamp(2.5rem, 1.6rem + 4.4vw, 6.5rem);
+  }
+
+  .section-intro {
+    max-width: 44ch;
+    color: var(--muted);
+  }
+
+  /* Hero */
+  .hero {
+    padding-block: clamp(56px, 9vw, 152px) clamp(72px, 10vw, 160px);
+  }
+
+  .hero__title {
+    max-width: 12ch;
+    font-size: clamp(3.25rem, 1.4rem + 8.4vw, 11rem);
+    line-height: 0.92;
+  }
+
+  .hero__foot {
+    display: grid;
+    gap: 32px;
+    margin-top: clamp(40px, 6vw, 88px);
+    padding-top: 28px;
+    border-top: 1px solid var(--ink);
+  }
+
+  .hero__lede {
+    max-width: 46ch;
+    font-size: clamp(1.05rem, 0.95rem + 0.45vw, 1.35rem);
+    color: var(--ink-soft);
+  }
+
+  .hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  @media (min-width: 900px) {
+    .hero__foot {
+      grid-template-columns: 1fr auto;
+      align-items: start;
+    }
+  }
+
+  /* Work */
+  .work__list {
+    display: grid;
+    gap: clamp(72px, 10vw, 152px);
+  }
+
+  .work-item {
+    display: grid;
+    gap: 28px;
+  }
+
+  .work-item__media {
+    display: block;
+    overflow: hidden;
+    aspect-ratio: 4 / 3;
+    border-radius: 4px;
+    background: #1a1a1a;
+  }
+
+  .work-item__media :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: scale(1.001);
+    transition:
+      filter 0.6s var(--ease-out),
+      transform 1.2s var(--ease-out);
+  }
+
+  @media (hover: hover) {
+    .work-item:hover .work-item__media :global(img) {
+      filter: none;
+      transform: scale(1.03);
+    }
+  }
+
+  .work-item__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 20px;
+    margin-bottom: 20px;
+    font-size: 0.8rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted-on-ink);
+  }
+
+  .work-item__meta span:first-child {
+    color: var(--paper);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .work-item__title {
+    font-size: clamp(2.25rem, 1.5rem + 3vw, 4.5rem);
+    margin-bottom: 20px;
+  }
+
+  .work-item__teaser {
+    max-width: 48ch;
+    margin-bottom: 24px;
+    color: var(--muted-on-ink);
+  }
+
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 32px;
+  }
+
+  .tags li {
+    padding: 6px 12px;
+    border: 1px solid var(--line-on-ink);
+    border-radius: 999px;
+    font-size: 0.8rem;
+  }
+
+  @media (min-width: 900px) {
+    .work-item {
+      grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+      gap: clamp(40px, 5vw, 96px);
+      align-items: start;
+    }
+
+    /* Mirror the layout on every other project, keeping the photo the
+       wider column both times. */
+    .work-item:nth-child(even) {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    }
+
+    .work-item:nth-child(even) .work-item__media {
+      order: 2;
+    }
+
+    .work-item__body {
+      padding-top: clamp(8px, 2vw, 40px);
+    }
+  }
+
+  /* Services */
+  .services__grid {
+    display: grid;
+    gap: 0 clamp(40px, 5vw, 96px);
+  }
+
+  .service {
+    padding: 36px 0 48px;
+    border-top: 1px solid var(--ink);
+  }
+
+  .service__num {
+    margin-bottom: 20px;
+    font-size: 0.8rem;
+    font-variant-numeric: tabular-nums;
+    color: var(--muted);
+  }
+
+  .service__title {
+    font-size: clamp(2rem, 1.5rem + 2vw, 3.5rem);
+    margin-bottom: 20px;
+  }
+
+  .service__summary {
+    max-width: 46ch;
+    margin-bottom: 24px;
+    color: var(--ink-soft);
+  }
+
+  .service__list li {
+    display: flex;
+    gap: 12px;
+    padding: 10px 0;
+    border-top: 1px solid var(--line);
+    font-size: 0.95rem;
+  }
+
+  .service__list li::before {
+    content: '—';
+    color: var(--muted);
+  }
+
+  @media (min-width: 900px) {
+    .services__grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  /* The one percent */
+  .details__grid {
+    display: grid;
+    gap: 1px;
+    background: var(--line-on-ink);
+    border-block: 1px solid var(--line-on-ink);
+  }
+
+  .detail {
+    padding: clamp(28px, 3vw, 44px) clamp(0px, 2vw, 32px) clamp(32px, 3.5vw, 52px);
+    background: var(--ink);
+  }
+
+  .detail__pct {
+    display: inline-block;
+    margin-bottom: 28px;
+    padding: 3px 7px 2px;
+    border: 1px solid var(--paper);
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 640;
+    font-variation-settings: 'wdth' 82;
+  }
+
+  .detail__title {
+    margin-bottom: 14px;
+    font-size: clamp(1.5rem, 1.25rem + 0.9vw, 2.1rem);
+    line-height: 1.05;
+  }
+
+  .detail p {
+    max-width: 40ch;
+    color: var(--muted-on-ink);
+  }
+
+  @media (min-width: 700px) {
+    .details__grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .detail {
+      padding-inline: clamp(20px, 2.5vw, 40px);
+    }
+  }
+
+  @media (min-width: 1100px) {
+    .details__grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  /* Process */
+  .process__steps {
+    display: grid;
+    gap: 0 clamp(24px, 3vw, 48px);
+    counter-reset: step;
+  }
+
+  .step {
+    padding: 28px 0 40px;
+    border-top: 1px solid var(--ink);
+  }
+
+  .step__num {
+    margin-bottom: clamp(24px, 4vw, 64px);
+    font-size: clamp(3rem, 2rem + 3vw, 5.5rem);
+    font-weight: 300;
+    font-variation-settings: 'wdth' 75;
+    letter-spacing: -0.04em;
+    line-height: 1;
+  }
+
+  .step__title {
+    margin-bottom: 12px;
+    font-size: clamp(1.5rem, 1.3rem + 0.8vw, 2rem);
+  }
+
+  .step p:last-child {
+    color: var(--ink-soft);
+  }
+
+  @media (min-width: 700px) {
+    .process__steps {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 1100px) {
+    .process__steps {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+
+  /* About */
+  .about {
+    border-top: 1px solid var(--line);
+  }
+
+  .about__inner {
+    display: grid;
+    gap: 40px clamp(48px, 7vw, 128px);
+  }
+
+  .about__copy {
+    display: grid;
+    gap: 20px;
+    max-width: 60ch;
+    color: var(--ink-soft);
+  }
+
+  .about__lead {
+    font-size: clamp(1.25rem, 1.05rem + 0.8vw, 1.75rem);
+    line-height: 1.35;
+    color: var(--ink);
+  }
+
+  @media (min-width: 1000px) {
+    .about__inner {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      align-items: start;
+    }
+
+    .about__copy {
+      padding-top: 44px;
+    }
+  }
+
+  /* Contact */
+  .contact__title {
+    max-width: 14ch;
+    margin-bottom: clamp(48px, 7vw, 104px);
+    font-size: clamp(3rem, 1.4rem + 7.4vw, 9.5rem);
+    line-height: 0.92;
+  }
+
+  .contact__grid {
+    display: grid;
+    gap: 56px clamp(48px, 7vw, 128px);
+    padding-top: 32px;
+    border-top: 1px solid var(--paper);
+  }
+
+  .contact__lede {
+    max-width: 40ch;
+    margin-bottom: 28px;
+    color: var(--muted-on-ink);
+  }
+
+  .contact__email {
+    display: inline-block;
+    max-width: 100%;
+    font-size: clamp(1.5rem, 0.9rem + 3vw, 3.5rem);
+    font-weight: 600;
+    font-variation-settings: 'wdth' 82;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    overflow-wrap: anywhere;
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 0.18em;
+    transition: text-underline-offset 0.3s var(--ease-out);
+  }
+
+  .contact__email:hover {
+    text-underline-offset: 0.08em;
+  }
+
+  .contact__alt {
+    margin-top: 20px;
+    color: var(--muted-on-ink);
+  }
+
+  .contact__help-title {
+    margin-bottom: 16px;
+    font-size: 0.8rem;
+    font-weight: 560;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    font-variation-settings: 'wdth' 100;
+    color: var(--muted-on-ink);
+  }
+
+  .contact__help li {
+    padding: 12px 0;
+    border-top: 1px solid var(--line-on-ink);
+  }
+
+  @media (min-width: 900px) {
+    .contact__grid {
+      grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+      align-items: start;
+    }
+  }
+</style>

@@ -1,0 +1,54 @@
+---
+// The logo is the name: "TheOnePercent" with the "1%" set in a solid block.
+// Screen readers get the name as one string via aria-label on the parent link.
+import { site } from '../data/site';
+
+interface Props {
+  size?: 'sm' | 'lg';
+  class?: string;
+}
+const { size = 'sm', class: className } = Astro.props;
+---
+
+<span class:list={['wordmark', `wordmark--${size}`, className]} aria-hidden="true">
+  <span class="wordmark__lead">{site.nameLead}</span><span class="wordmark__mark">{site.nameMark}</span>
+</span>
+
+<style>
+  .wordmark {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.12em;
+    font-family: var(--font-sans);
+    font-weight: 720;
+    font-variation-settings: 'wdth' 78;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    white-space: nowrap;
+  }
+
+  .wordmark--sm {
+    font-size: 1.375rem;
+  }
+
+  .wordmark--lg {
+    font-size: clamp(2.5rem, 11.5vw, 13rem);
+    letter-spacing: -0.05em;
+  }
+
+  /* The "1%" sits in a solid block: ink on paper backgrounds, and
+     inverted on .on-ink sections. */
+  .wordmark__mark {
+    display: inline-block;
+    padding: 0.08em 0.14em 0.06em;
+    border-radius: 0.12em;
+    background: var(--ink);
+    color: var(--paper);
+    letter-spacing: -0.02em;
+  }
+
+  :global(.on-ink) .wordmark__mark {
+    background: var(--paper);
+    color: var(--ink);
+  }
+</style>

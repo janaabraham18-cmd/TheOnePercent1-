@@ -1,0 +1,96 @@
+---
+import Wordmark from './Wordmark.astro';
+import { site, nav } from '../data/site';
+
+const year = new Date().getFullYear();
+const socials = [
+  { label: 'Instagram', href: site.social.instagram },
+  { label: 'LinkedIn', href: site.social.linkedin },
+].filter((s) => s.href);
+---
+
+<footer class="site-footer on-ink">
+  <div class="wrap">
+    <div class="site-footer__top">
+      <ul class="site-footer__links">
+        {nav.map((item) => (
+          <li><a href={item.href}>{item.label}</a></li>
+        ))}
+        <li><a href="/#contact">Contact</a></li>
+      </ul>
+      <div class="site-footer__contact">
+        <a href={`mailto:${site.contact.email}`}>{site.contact.email}</a>
+        {socials.map((s) => (
+          <a href={s.href} rel="noopener" target="_blank">{s.label}</a>
+        ))}
+      </div>
+    </div>
+
+    <a class="site-footer__mark" href="/" aria-label={`${site.name} home`}>
+      <Wordmark size="lg" />
+    </a>
+
+    <div class="site-footer__bottom">
+      <p>© {year} {site.name}</p>
+      <p>{site.kind}</p>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    padding: clamp(56px, 8vw, 104px) 0 28px;
+    overflow: hidden;
+  }
+
+  .site-footer__top {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 32px 48px;
+    padding-bottom: clamp(48px, 7vw, 96px);
+  }
+
+  .site-footer__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 32px;
+  }
+
+  .site-footer__contact {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 32px;
+  }
+
+  .site-footer a {
+    text-decoration: none;
+  }
+
+  .site-footer__top a {
+    text-decoration-thickness: 1px;
+    text-underline-offset: 4px;
+  }
+
+  .site-footer__top a:hover {
+    text-decoration-line: underline;
+  }
+
+  .site-footer__mark {
+    display: block;
+    color: var(--paper);
+    max-width: 100%;
+  }
+
+  .site-footer__bottom {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 8px 24px;
+    margin-top: clamp(24px, 3vw, 40px);
+    padding-top: 20px;
+    border-top: 1px solid var(--line-on-ink);
+    font-size: 0.85rem;
+    color: var(--muted-on-ink);
+  }
+</style>

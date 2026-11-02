@@ -1,0 +1,344 @@
+---
+import { Image, getImage } from 'astro:assets';
+import Base from '../../layouts/Base.astro';
+import { projects, type Project } from '../../data/work';
+import { hl } from '../../utils/text';
+
+export function getStaticPaths() {
+  return projects.map((project, i) => ({
+    params: { slug: project.slug },
+    props: { project, next: projects[(i + 1) % projects.length] },
+  }));
+}
+
+interface Props {
+  project: Project;
+  next: Project;
+}
+
+const { project: p, next } = Astro.props;
+const og = await getImage({ src: p.cover.src, width: 1200, format: 'jpg' });
+---
+
+<Base title={p.client} description={p.teaser} image={og.src}>
+  <article>
+    <header class="cs-hero">
+      <div class="wrap">
+        <a class="cs-back" href="/#work"><span aria-hidden="true">←</span> All work</a>
+        <p class="label">{p.sector}</p>
+        <h1 class="cs-title" set:html={hl(p.client, p.accent)} />
+        <p class="cs-teaser">{p.teaser}</p>
+
+        <dl class="cs-meta">
+          <div>
+            <dt>Client</dt>
+            <dd>{p.client}</dd>
+          </div>
+          <div>
+            <dt>Location</dt>
+            <dd>{p.location}</dd>
+          </div>
+          <div>
+            <dt>Year</dt>
+            <dd>{p.year}</dd>
+          </div>
+          <div>
+            <dt>What we did</dt>
+            <dd>{p.services.join(', ')}</dd>
+          </div>
+          {p.url && (
+            <div>
+              <dt>Live site</dt>
+              <dd>
+                <a href={p.url} target="_blank" rel="noopener">{p.urlLabel} <span aria-hidden="true">↗</span></a>
+              </dd>
+            </div>
+          )}
+        </dl>
+      </div>
+    </header>
+
+    <div class="cs-cover wrap">
+      <Image
+        src={p.cover.src}
+        alt={p.cover.alt}
+        widths={[800, 1280, 1600, 2400]}
+        sizes="(min-width: 1440px) 1328px, calc(100vw - 2 * var(--gutter))"
+        loading="eager"
+      />
+    </div>
+
+    <section class="cs-section">
+      <div class="wrap cs-split">
+        <h2 class="cs-h2">The <span class="serif">brief</span></h2>
+        <p class="cs-brief" data-reveal>{p.brief}</p>
+      </div>
+    </section>
+
+    <section class="cs-section cs-section--line">
+      <div class="wrap cs-split">
+        <h2 class="cs-h2">What we <span class="serif">built</span></h2>
+        <ol class="cs-built">
+          {p.built.map((b, i) => (
+            <li data-reveal>
+              <span class="cs-built__num">{String(i + 1).padStart(2, '0')}</span>
+              <div>
+                <h3>{b.title}</h3>
+                <p>{b.body}</p>
+              </div>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </section>
+
+    <section class="cs-gallery" aria-label="Project photos">
+      <div class="wrap cs-gallery__grid">
+        {p.gallery.map((img) => (
+          <figure data-reveal>
+            <Image
+              src={img.src}
+              alt={img.alt}
+              widths={[480, 800, 1200]}
+              sizes="(min-width: 900px) 33vw, 100vw"
+            />
+          </figure>
+        ))}
+      </div>
+    </section>
+
+    <section class="cs-section cs-details on-ink">
+      <div class="wrap cs-split">
+        <h2 class="cs-h2">The one <span class="serif">percent</span></h2>
+        <ul class="cs-details__list">
+          {p.details.map((d) => (
+            <li data-reveal><span class="cs-details__pct" aria-hidden="true">1%</span>{d}</li>
+          ))}
+        </ul>
+      </div>
+    </section>
+
+    <nav class="cs-next" aria-label="Next project">
+      <div class="wrap">
+        <a class="cs-next__link mono-trigger" href={`/work/${next.slug}`}>
+          <span class="label">Next project</span>
+          <span class="cs-next__title" set:html={hl(next.client, next.accent)} />
+          <span class="cs-next__arrow" aria-hidden="true">→</span>
+        </a>
+      </div>
+    </nav>
+  </article>
+</Base>
+
+<style>
+  .cs-hero {
+    padding-block: clamp(32px, 5vw, 72px) clamp(40px, 6vw, 88px);
+  }
+
+  .cs-back {
+    display: inline-flex;
+    gap: 8px;
+    margin-bottom: clamp(40px, 6vw, 88px);
+    font-size: 0.9rem;
+    text-decoration: none;
+  }
+
+  .cs-back:hover {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+
+  .cs-title {
+    max-width: 14ch;
+    font-size: clamp(3rem, 1.4rem + 7vw, 9rem);
+    line-height: 0.92;
+    margin-bottom: clamp(24px, 3vw, 40px);
+  }
+
+  .cs-teaser {
+    max-width: 52ch;
+    font-size: clamp(1.1rem, 1rem + 0.45vw, 1.4rem);
+    color: var(--ink-soft);
+  }
+
+  .cs-meta {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr));
+    gap: 24px 32px;
+    margin: clamp(40px, 5vw, 72px) 0 0;
+    padding-top: 24px;
+    border-top: 1px solid var(--ink);
+  }
+
+  .cs-meta dt {
+    margin-bottom: 6px;
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .cs-meta dd {
+    margin: 0;
+  }
+
+  .cs-meta a {
+    text-underline-offset: 3px;
+  }
+
+  .cs-cover :global(img) {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    border-radius: 4px;
+  }
+
+  .cs-section {
+    padding-block: clamp(72px, 9vw, 144px);
+  }
+
+  .cs-section--line {
+    padding-top: 0;
+  }
+
+  .cs-section--line .cs-split {
+    padding-top: clamp(56px, 7vw, 104px);
+    border-top: 1px solid var(--line);
+  }
+
+  .cs-split {
+    display: grid;
+    gap: 32px clamp(48px, 7vw, 128px);
+  }
+
+  @media (min-width: 900px) {
+    .cs-split {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.6fr);
+      align-items: start;
+    }
+  }
+
+  .cs-h2 {
+    font-size: clamp(2.25rem, 1.6rem + 2.8vw, 4.5rem);
+  }
+
+  .cs-brief {
+    max-width: 56ch;
+    font-size: clamp(1.15rem, 1rem + 0.6vw, 1.6rem);
+    line-height: 1.4;
+  }
+
+  .cs-built li {
+    display: grid;
+    grid-template-columns: 48px minmax(0, 1fr);
+    gap: 16px;
+    padding: 28px 0;
+    border-top: 1px solid var(--line);
+  }
+
+  .cs-built li:first-child {
+    border-top: 0;
+    padding-top: 0;
+  }
+
+  .cs-built__num {
+    padding-top: 4px;
+    font-size: 0.8rem;
+    font-variant-numeric: tabular-nums;
+    color: var(--muted);
+  }
+
+  .cs-built h3 {
+    margin-bottom: 10px;
+    font-size: clamp(1.4rem, 1.2rem + 0.8vw, 2rem);
+    line-height: 1.05;
+  }
+
+  .cs-built p {
+    max-width: 56ch;
+    color: var(--ink-soft);
+  }
+
+  .cs-gallery__grid {
+    display: grid;
+    gap: clamp(12px, 1.5vw, 24px);
+  }
+
+  .cs-gallery figure {
+    margin: 0;
+  }
+
+  .cs-gallery :global(img) {
+    width: 100%;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+    border-radius: 4px;
+  }
+
+  @media (min-width: 900px) {
+    .cs-gallery__grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  .cs-details {
+    margin-top: clamp(72px, 9vw, 144px);
+  }
+
+  .cs-details__list li {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 20px;
+    align-items: baseline;
+    padding: 22px 0;
+    border-top: 1px solid var(--line-on-ink);
+    font-size: clamp(1.05rem, 1rem + 0.3vw, 1.25rem);
+  }
+
+  .cs-details__list li:first-child {
+    border-top: 0;
+    padding-top: 0;
+  }
+
+  .cs-details__pct {
+    padding: 3px 7px 2px;
+    border: 1px solid var(--paper);
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-weight: 640;
+  }
+
+  .cs-next {
+    padding-block: clamp(56px, 8vw, 120px);
+  }
+
+  .cs-next__link {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: end;
+    gap: 0 24px;
+    text-decoration: none;
+  }
+
+  .cs-next__link .label {
+    grid-column: 1 / -1;
+  }
+
+  .cs-next__title {
+    font-size: clamp(2.5rem, 1.4rem + 5vw, 7rem);
+    font-weight: 640;
+    font-variation-settings: 'wdth' 82;
+    letter-spacing: -0.035em;
+    line-height: 0.95;
+  }
+
+  .cs-next__arrow {
+    font-size: clamp(2rem, 1.4rem + 3vw, 5rem);
+    line-height: 1;
+    transition: transform 0.4s var(--ease-out);
+  }
+
+  .cs-next__link:hover .cs-next__arrow {
+    transform: translateX(8px);
+  }
+</style>

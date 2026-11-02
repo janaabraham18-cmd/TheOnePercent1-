@@ -5,8 +5,8 @@
 //
 // Needs Playwright's Chromium once per machine: npx playwright install chromium
 //
-// For every page at every width it checks: no sideways scroll, no script
-// errors, no "[ink]" warnings (the pen line reporting a renamed section), and
+// For every page at every width it checks: no sideways scroll, no empty space
+// under the footer, no script errors, no "[ink]" warnings (the pen line reporting a renamed section), and
 // that the header shows the full nav or the menu button at the right widths.
 // On the home page it also checks the brand film draws, the "Is your site in
 // the 99%?" quiz gives a result, and the enquiry form flags empty fields.
@@ -94,6 +94,13 @@ async function checkPage(browser, base, path, width) {
 
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth - innerWidth);
   if (overflow !== 0) fail(where, `page scrolls sideways by ${overflow}px`);
+
+  // Nothing (like the ink layers) should hold the page open below the footer.
+  const below = await page.evaluate(() => {
+    const footer = document.querySelector('.site-footer');
+    return footer ? Math.round(document.documentElement.scrollHeight - (footer.getBoundingClientRect().bottom + scrollY)) : 0;
+  });
+  if (below > 1) fail(where, `${below}px of empty space under the footer`);
 
   const header = await page.evaluate(() => {
     const shown = (sel) => {

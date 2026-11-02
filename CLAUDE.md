@@ -100,8 +100,9 @@ as they're confirmed.
 
 Run `npm test` before pushing. It builds, then loads every page at 375, 768, 1024, 1280,
 1440, 1920 and 2560px and fails on sideways scroll (`scrollWidth - innerWidth` must be 0),
-script or console errors, `[ink]` warnings, the header showing the wrong nav for the width,
-or the brand film / quick check / enquiry form validation not working. It doesn't judge how
+empty space under the footer, script or console errors, `[ink]` warnings, the header showing
+the wrong nav for the width, or the brand film / quick check / enquiry form validation not
+working. It doesn't judge how
 things look, so still screenshot anything you change at a few of those widths.
 
 Pair `vw` sizes with `clamp()`. In grid rows pairing a photo with text, use `align-items: start`.

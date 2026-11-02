@@ -122,6 +122,10 @@ let intro = reduce ? Infinity : 0;
 
 function build() {
   const W = document.documentElement.clientWidth;
+  // Measure the page without these layers: they're sized to the page, so if
+  // they counted they'd hold it at its old height whenever the content gets
+  // shorter (fonts or images finishing loading), leaving white under the footer.
+  for (const layer of [svg, gold]) layer.setAttribute('height', '0');
   const H = document.documentElement.scrollHeight;
   const narrow = W < 700;
   for (const layer of [svg, gold]) {

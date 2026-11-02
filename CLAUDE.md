@@ -13,9 +13,10 @@ Astro (static). `npm run build` runs `astro check` before building.
   remembered dot in the 100-dot grid, the process geometry, the sun arcs in the work section,
   the construction circle on the hero "O", section numbers (`.label__num`), the "1%" badges,
   the contact email underline, the nav hover line, and the logo's "1%" block.
-- **The name is the logo.** `Wordmark.astro` renders "TheOnePercent" plus a solid gold "1%"
-  block with black text (`--gold` on light sections, `--gold-bright` inside `.on-ink`); the hero
-  `KineticWordmark.astro` and `public/favicon.svg` match. Always write the name as
+- **The name is the logo.** `Wordmark.astro` renders "TheOnePercent" plus the "1%" as a
+  sharp-cornered gold slab (no radius) with a bold black "1" and a half-size "%" raised like an
+  exponent (`--gold` on light sections, `--gold-bright` inside `.on-ink`); the hero/footer
+  `KineticWordmark.astro`, the brand film's final logo and `public/favicon.svg` match. Always write the name as
   `TheOnePercent1%` (`site.name`) in copy, titles and alt text.
 - **Hero "TOP" animation.** `KineticWordmark.astro` starts on "TOP" and stretches out into
   "TheOnePercent", then the "1%" block lands (replays on mouse hover). With no JS or with

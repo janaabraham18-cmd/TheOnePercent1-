@@ -1,5 +1,6 @@
 ---
-// The logo is the name: "TheOnePercent" with the "1%" set in a solid gold block.
+// The logo is the name: "TheOnePercent" with the "1%" set in a sharp gold slab,
+// the % small and raised like an exponent.
 // Screen readers get the name as one string via aria-label on the parent link.
 import { site } from '../data/site';
 
@@ -11,7 +12,7 @@ const { size = 'sm', class: className } = Astro.props;
 ---
 
 <span class:list={['wordmark', `wordmark--${size}`, className]} aria-hidden="true">
-  <span class="wordmark__lead">{site.nameLead}</span><span class="wordmark__mark">{site.nameMark}</span>
+  <span class="wordmark__lead">{site.nameLead}</span><span class="wordmark__mark">{site.nameMark.slice(0, -1)}<span class="wordmark__pct">{site.nameMark.slice(-1)}</span></span>
 </span>
 
 <style>
@@ -39,12 +40,20 @@ const { size = 'sm', class: className } = Astro.props;
   /* The "1%" sits in a solid block: ink on paper backgrounds, and
      inverted on .on-ink sections. */
   .wordmark__mark {
-    display: inline-block;
-    padding: 0.08em 0.14em 0.06em;
-    border-radius: 0.12em;
+    display: inline-flex;
+    align-items: flex-start;
+    padding: 0.07em 0.12em 0.05em 0.14em;
     background: var(--gold);
     color: var(--ink);
+    font-weight: 800;
     letter-spacing: -0.02em;
+  }
+
+  /* The % sits small and raised, like an exponent. */
+  .wordmark__pct {
+    font-size: 0.5em;
+    margin-top: 0.08em;
+    margin-left: 0.06em;
   }
 
   /* The brighter gold reads better against black. */

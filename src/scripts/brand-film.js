@@ -385,7 +385,9 @@ function build(svg, W, H) {
   const capEm = parts.map(([c]) => measure(c, ST.word));
   const restEm = parts.map(([, rest]) => measure(rest, ST.word));
   const gapEm = 0.12;
-  const blockEm = measure('1%', ST.mark) + 0.28;
+  // The 1% slab: '1' plus a half-size raised '%', square corners.
+  const oneEm = measure('1', ST.mark);
+  const blockEm = oneEm + measure('%', ST.mark) * 0.5 + 0.06 + 0.26;
   const wordEm = capEm.reduce((a, b) => a + b, 0) + restEm.reduce((a, b) => a + b, 0);
   const fsL = Math.min(0.2 * H, (0.86 * W) / (wordEm + gapEm + blockEm));
   const fsBe = fit(measure('Be a part of the', ST.text), 0.7 * W, 0.065 * H);
@@ -412,7 +414,9 @@ function build(svg, W, H) {
   const white = el('circle', { cx: g99.x, cy: g99.y, r: 0, fill: C.paper }, cam);
   const block = el('g', {}, cam);
   const blockR = el('rect', {}, block);
-  const blockT = T(block, '1%', ST.mark, fsL, 0, baseL, { fill: C.ink });
+  const blockT = T(block, '1', ST.mark, fsL, 0, baseL, { fill: C.ink, 'font-weight': 800 });
+  const pctT = el('tspan', { 'font-size': fsL * 0.5, dx: 0.04 * fsL, dy: -0.27 * fsL }, blockT);
+  pctT.textContent = '%';
   const bW = blockEm * fsL, bH = 1.14 * fsL;
   const { capH: capL } = fontMetrics(fsL);
 
@@ -596,7 +600,7 @@ function build(svg, W, H) {
     set(blockR, {
       x: lerp(bx, g99.x - tr, m), y: lerp(by, g99.y - tr, m),
       width: lerp(bW, 2 * tr, m), height: lerp(bH, 2 * tr, m),
-      rx: lerp(0.12 * fsL, tr, m), fill: mix(C.goldBright, C.gold, m),
+      rx: lerp(0, tr, m), fill: mix(C.goldBright, C.gold, m),
     });
     set(blockT, { x: bx + 0.14 * fsL, opacity: 1 - seg(m, 0, 0.3) });
     const bcx = bx + bW / 2, bcy = by + bH / 2, bs = lerp(0.92, 1, settleK);

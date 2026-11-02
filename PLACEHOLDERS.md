@@ -7,6 +7,9 @@
 - [ ] **Location** (optional): `contact.location` in `site.ts`; not shown anywhere yet.
 - [ ] **About copy**: the About section on the home page is a draft written in a studio "we" voice. Swap to
       "I" if you'd rather present as a solo designer, and add your name/photo if you want them shown.
+- [ ] **Motion graphics & add-ons**: the Motion graphics service and the five add-ons (1% Audit,
+      Website refresh & move, Booking & enquiry systems, Local search setup, Social launch kit)
+      in `src/data/services.ts` are drafts. Check the wording and lists match what you'll deliver.
 - [ ] **Services**: `src/data/services.ts` is a draft. Check each service and its list matches what you
       actually offer. Prices are deliberately not shown ("quoted on scope"); add "from" prices if you prefer.
 - [ ] **Springtide case study**: there's no live link yet. Add `url`/`urlLabel` in `src/data/work.ts` once

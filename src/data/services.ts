@@ -55,6 +55,20 @@ export const services: Service[] = [
     ],
   },
   {
+    id: 'motion',
+    title: 'Motion graphics',
+    accent: 'Motion',
+    summary:
+      'Brands that move. Animated logos, social posts and website motion that make people stop scrolling, like the line drawing itself down this page.',
+    includes: [
+      'Animated logo intros and endings',
+      'Animated social posts, reels and story graphics',
+      'Website motion: scroll, hover and page-load animation',
+      'Short promo and explainer animations',
+      'Files sized for Instagram, TikTok, YouTube and screens',
+    ],
+  },
+  {
     id: 'care',
     title: 'Care & updates',
     accent: 'Care',
@@ -66,6 +80,35 @@ export const services: Service[] = [
       'Hosting and domain looked after',
       'Fixes and small improvements',
     ],
+  },
+];
+
+// Smaller, standalone pieces of work, listed under the main services.
+export const addons: { title: string; summary: string }[] = [
+  {
+    title: 'The 1% Audit',
+    summary:
+      'A review of the website you already have: speed, how it looks on phones and big screens, copy, search basics and broken links. You get a short list of fixes, most important first.',
+  },
+  {
+    title: 'Website refresh & move',
+    summary:
+      'A redesign of your current site, including moving off WordPress, Wix or Squarespace without losing your place on Google. Old links are sent to the right new pages.',
+  },
+  {
+    title: 'Booking & enquiry systems',
+    summary:
+      'Booking forms, WhatsApp enquiry buttons and payment links that fit how you actually take bookings, sent straight to your inbox or phone.',
+  },
+  {
+    title: 'Local search setup',
+    summary:
+      'Your Google Business Profile set up properly, with the right photos, hours and categories, plus an easy way to ask customers for reviews, so you show up in “near me” searches.',
+  },
+  {
+    title: 'Social launch kit',
+    summary:
+      'Profile picture, banner, post and story templates and highlight covers, so your brand looks the same on every platform from day one.',
   },
 ];
 

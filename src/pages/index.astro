@@ -4,7 +4,7 @@ import KineticWordmark from '../components/KineticWordmark.astro';
 import ClientLogo from '../components/ClientLogo.astro';
 import InkWord from '../components/InkWord.astro';
 import { site } from '../data/site';
-import { services, details, process } from '../data/services';
+import { services, addons, details, process } from '../data/services';
 import { projects } from '../data/work';
 import { hl } from '../utils/text';
 
@@ -140,6 +140,22 @@ const compare = [
             </ul>
           </article>
         ))}
+      </div>
+
+      <div class="addons">
+        <div class="addons__head" data-reveal>
+          <p class="label">Add-ons</p>
+          <h3 class="addons__title">Smaller jobs, same <span class="serif">standards</span>.</h3>
+          <p class="addons__intro">On their own, or alongside a bigger project.</p>
+        </div>
+        <ul class="addons__list">
+          {addons.map((a) => (
+            <li class="addon" data-reveal>
+              <h4 class="addon__title">{a.title}</h4>
+              <p class="addon__summary">{a.summary}</p>
+            </li>
+          ))}
+        </ul>
       </div>
     </div>
   </section>
@@ -561,6 +577,74 @@ const compare = [
   @media (min-width: 900px) {
     .services__grid {
       grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    /* An odd one out at the end takes the full row, with its list beside
+       the summary rather than leaving half the row empty. */
+    .service:last-child:nth-child(odd) {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 0 clamp(40px, 5vw, 96px);
+      align-items: start;
+    }
+
+    .service:last-child:nth-child(odd) .service__list {
+      grid-column: 2;
+      grid-row: 1 / span 3;
+    }
+  }
+
+  /* Add-ons */
+  .addons {
+    display: grid;
+    gap: 32px clamp(40px, 5vw, 96px);
+    margin-top: clamp(56px, 7vw, 104px);
+    padding-top: clamp(32px, 4vw, 48px);
+    border-top: 1px solid var(--ink);
+  }
+
+  .addons__title {
+    margin-bottom: 14px;
+    font-size: clamp(1.75rem, 1.3rem + 1.8vw, 3rem);
+  }
+
+  .addons__intro {
+    color: var(--muted);
+  }
+
+  .addon {
+    display: grid;
+    gap: 8px 32px;
+    padding: 20px 0 22px;
+    border-top: 1px solid var(--line);
+  }
+
+  .addon:first-child {
+    border-top: 0;
+    padding-top: 0;
+  }
+
+  .addon__title {
+    margin: 0;
+    font-size: clamp(1.2rem, 1.05rem + 0.5vw, 1.5rem);
+    line-height: 1.15;
+  }
+
+  .addon__summary {
+    max-width: 60ch;
+    color: var(--ink-soft);
+  }
+
+  @media (min-width: 900px) {
+    .addons {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+      align-items: start;
+    }
+
+    .addon {
+      grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.4fr);
+      align-items: baseline;
     }
   }
 

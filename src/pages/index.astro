@@ -361,7 +361,7 @@ const compare = [
   }
 
   .dots__dot--one {
-    background: var(--ink);
+    background: var(--gold);
     transform: scale(1.25);
   }
 
@@ -581,8 +581,9 @@ const compare = [
     display: inline-block;
     margin-bottom: 28px;
     padding: 3px 7px 2px;
-    border: 1px solid var(--paper);
+    border: 1px solid var(--gold-bright);
     border-radius: 4px;
+    color: var(--gold-bright);
     font-size: 0.75rem;
     font-weight: 640;
     font-variation-settings: 'wdth' 82;
@@ -616,6 +617,13 @@ const compare = [
   }
 
   /* Process */
+  /* Room under the steps for the golden-ratio construction (desktop). */
+  @media (min-width: 900px) {
+    .process {
+      padding-bottom: clamp(260px, 26vw, 400px);
+    }
+  }
+
   .process__steps {
     display: grid;
     gap: 0 clamp(24px, 3vw, 48px);
@@ -722,6 +730,7 @@ const compare = [
     line-height: 1.1;
     overflow-wrap: anywhere;
     text-decoration: underline;
+    text-decoration-color: var(--gold-bright);
     text-decoration-thickness: 2px;
     text-underline-offset: 0.18em;
     transition: text-underline-offset 0.3s var(--ease-out);

@@ -11,9 +11,11 @@
 //    process section a shape on each timeline step (circle, triangle, square,
 //    hexagon) plus a golden-ratio construction in the empty corner.
 //
-// Everything is drawn white with mix-blend-mode: difference, so it reads
-// black over white sections and white over black ones. The layer sits at
-// z 0, under all content (.wrap is z 1).
+// The neutral layer is drawn white with mix-blend-mode: difference, so it
+// reads black over white sections and white over black ones. Gold can't go
+// through that blend (gold over white would invert to blue), so the gold
+// accents (process geometry, sun arcs, the "O" construction circle) live on
+// a second, unblended layer. Both sit at z 0, under all content (.wrap, z 1).
 
 const NS = 'http://www.w3.org/2000/svg';
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -38,10 +40,14 @@ svg.classList.add('ink-thread');
 svg.setAttribute('aria-hidden', 'true');
 const gGrid = make('g', { class: 'ink-grid' }, svg);
 const gArt = make('g', { class: 'ink-art' }, svg);
-const gGeo = make('g', { class: 'ink-geo' }, svg);
+const gold = document.createElementNS(NS, 'svg');
+gold.classList.add('ink-gold');
+gold.setAttribute('aria-hidden', 'true');
+const gGeo = make('g', { class: 'ink-geo' }, gold);
+const gGoldArt = make('g', { class: 'ink-gold__art' }, gold);
 const thread = make('path', { class: 'ink-thread__line' }, svg);
 const tip = make('circle', { class: 'ink-thread__tip', r: 3 }, svg);
-document.body.prepend(svg);
+document.body.prepend(svg, gold);
 
 // Layout position, ignoring transforms (the scroll reveals shift elements).
 function pagePos(el: HTMLElement): Pt {
@@ -118,12 +124,15 @@ function build() {
   const W = document.documentElement.clientWidth;
   const H = document.documentElement.scrollHeight;
   const narrow = W < 700;
-  svg.setAttribute('width', String(W));
-  svg.setAttribute('height', String(H));
-  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  for (const layer of [svg, gold]) {
+    layer.setAttribute('width', String(W));
+    layer.setAttribute('height', String(H));
+    layer.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  }
   gGrid.replaceChildren();
   gArt.replaceChildren();
   gGeo.replaceChildren();
+  gGoldArt.replaceChildren();
   gridItems = [];
   oItems = [];
   artItems = [];
@@ -275,7 +284,7 @@ function build() {
       const across = steps.every((s) => Math.abs(s.y - steps[0].y) < 4);
       const lastStep = steps[steps.length - 1];
       if (across) {
-        const ty = steps[0].y - 18;
+        const ty = steps[0].y - (narrow ? 18 : 46);
         P(steps[0].x - 12, ty);
         timeline = { i: pts.length - 1, x: steps[0].x - 12, y: ty, across };
         steps.forEach((s) => P(s.x + s.w * 0.5, ty));
@@ -398,7 +407,7 @@ function build() {
         const cx = O.x + O.w / 2;
         const cy = base - capH / 2;
         const r = capH * 0.56;
-        oItems.push({ el: stroke(shape({ x: cx, y: cy }, r, 0), gGrid, 'ink-grid__o'), a: 0, b: 0.7 });
+        oItems.push({ el: stroke(shape({ x: cx, y: cy }, r, 0), gGoldArt, 'ink-grid__o'), a: 0, b: 0.7 });
         const sq = `M ${f(cx - r)} ${f(cy - r)} H ${f(cx + r)} V ${f(cy + r)} H ${f(cx - r)} Z`;
         oItems.push({ el: stroke(sq, gGrid, 'ink-grid__type'), a: 0.2, b: 0.9 });
         const cross = `M ${f(cx - r * 1.5)} ${f(cy)} H ${f(cx + r * 1.5)} M ${f(cx)} ${f(cy - r * 1.5)} V ${f(cy + r * 1.5)}`;
@@ -416,7 +425,7 @@ function build() {
     const sx = W * 0.8;
     for (let i = 0; i < 5; i++) {
       const r = (90 + i * 46) * scale;
-      const el = stroke(`M ${f(sx - r)} ${f(S.y)} A ${f(r)} ${f(r)} 0 0 0 ${f(sx + r)} ${f(S.y)}`, gArt, 'ink-art__arc');
+      const el = stroke(`M ${f(sx - r)} ${f(S.y)} A ${f(r)} ${f(r)} 0 0 0 ${f(sx + r)} ${f(S.y)}`, gGoldArt, 'ink-art__arc');
       artItems.push({ el, a: i * 0.04, b: 0.25 + i * 0.04 });
     }
     const n = 9;
@@ -440,16 +449,21 @@ function build() {
   if (timeline) {
     // Circle, triangle, square, hexagon: the project gaining structure.
     const sides = [0, 3, 4, 6];
-    const r = narrow ? 6 : 15;
     const tl = timeline;
+    // On the desktop timeline the shapes sit on the line. When the steps
+    // stack (phones, narrow laptops) the gutter is too thin, so each shape
+    // sits beside its big step number instead, in the empty space on the right.
+    const r = tl.across ? 28 : narrow ? 20 : 24;
     const l0 = lens[tl.i];
     $$('.step').forEach((el, i) => {
       const s = rect(el);
-      const c = tl.across ? { x: s.x + r + 2, y: tl.y } : { x: tl.x, y: s.y + r + 6 };
+      const num = el.querySelector<HTMLElement>('.step__num');
+      const nr = num ? rect(num) : { x: s.x, y: s.y + 28, w: 0, h: 2 * r };
+      const c = tl.across ? { x: s.x + r, y: tl.y } : { x: s.x + s.w - r - 2, y: nr.y + nr.h / 2 };
       const at = l0 + (tl.across ? c.x - tl.x : c.y - tl.y) - r;
       const paths: SVGElement[] = [stroke(shape(c, r, sides[i % sides.length]), gGeo, 'ink-geo__node')];
       // A small centre point, like a compass mark.
-      paths.push(stroke(shape(c, 1.6, 0), gGeo, 'ink-geo__node'));
+      paths.push(stroke(shape(c, Math.max(1.6, r * 0.09), 0), gGeo, 'ink-geo__node'));
       nodes.push({ paths, at });
     });
 
@@ -460,7 +474,7 @@ function build() {
       const R = rect(proc);
       geo = { top: R.y, span: R.h * 0.95 };
       const stepsBottom = Math.max(...$$('.step').map((el) => { const s = rect(el); return s.y + s.h; }));
-      const h = Math.max(110, Math.min(230, R.y + R.h - stepsBottom - 40));
+      const h = Math.max(110, Math.min(300, R.y + R.h - stepsBottom - 60));
       const phi = (1 + Math.sqrt(5)) / 2;
       const w = h * phi;
       const right = W - Math.max(40, (W - procWrap.offsetWidth) / 2 + 30);
@@ -551,7 +565,7 @@ function render() {
   drawItems(artItems, reduce ? 1 : (penY - art.top) / art.span);
   drawItems(geoItems, reduce ? 1 : (penY - geo.top) / geo.span);
   for (const node of nodes) {
-    const t = reduce ? 1 : clamp01((drawn - node.at) / 60);
+    const t = reduce ? 1 : clamp01((drawn - node.at) / 110);
     const n = node.paths.length;
     node.paths.forEach((p, i) => setProgress(p, clamp01(t * n - i)));
   }

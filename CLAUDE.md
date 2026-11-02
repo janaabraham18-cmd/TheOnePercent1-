@@ -5,8 +5,14 @@ Astro (static). `npm run build` runs `astro check` before building.
 
 ## Brand rules
 
-- **Black and white only.** `--ink` and `--paper` in `src/styles/global.css`; greys only
-  for secondary text and hairlines. No accent colours.
+- **Black and white, with gold as the only accent.** `--ink` and `--paper` in
+  `src/styles/global.css`; greys only for secondary text and hairlines. Gold (`--gold` on
+  white, `--gold-bright` on black, `--gold-text` for small text on white; `--gold-here` /
+  `--gold-text-here` pick the right one automatically inside `.on-ink`) is for a few
+  deliberate details only, never large areas: the hand-drawn marks on accent words, the one
+  remembered dot in the 100-dot grid, the process geometry, the sun arcs in the work section,
+  the construction circle on the hero "O", section numbers (`.label__num`), the "1%" badges,
+  the contact email underline and the nav hover line. The logo stays black and white.
 - **The name is the logo.** `Wordmark.astro` renders "TheOnePercent" plus a solid "1%" block
   (ink block on light sections, inverted inside `.on-ink`). Always write the name as
   `TheOnePercent1%` (`site.name`) in copy, titles and alt text.
@@ -33,10 +39,13 @@ Astro (static). `npm run build` runs `astro check` before building.
     from the real wordmark, drawn on load; a construction circle + square on the "O" once TOP
     finishes stretching (`kw:done` event from `KineticWordmark.astro`).
   - **Work (black):** a flowing ribbon of parallel lines and sun arcs, drawn as you scroll.
-  - **Process (geometry):** the pen becomes a straight timeline through a shape on each step,
-    drawn as the pen passes: circle, triangle, square, hexagon (a project gaining structure).
-    A golden-ratio construction (golden rectangle, square divisions, spiral, guide circle and
-    diagonal) fills the empty space bottom right on desktop, drawn as you scroll.
+  - **Process (geometry, gold):** the pen becomes a straight timeline through a big shape on
+    each step, drawn as the pen passes: circle, triangle, square, hexagon (a project gaining
+    structure). When the steps stack (narrow screens) each shape sits beside its step number
+    instead. A golden-ratio construction (golden rectangle, square divisions, spiral, guide
+    circle and diagonal) fills the extra bottom padding of `.process` on desktop (≥900px).
+  - **Gold layer:** gold can't go through the difference blend (gold on white inverts to
+    blue), so gold drawings live on a second, unblended SVG (`.ink-gold`) at the same z.
 - **Marks on accent words.** h1/h2 accent words use `<InkWord mark="...">` (swoosh, double,
   zigzag, circle, strike) instead of a plain `.serif` span; the pen draws the mark when it
   reaches the word. Negative words get `strike` ("forgettable"). h3s stay plain `.serif`.

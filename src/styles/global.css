@@ -1,5 +1,6 @@
-/* TheOnePercent1% — black and white, nothing else.
-   Greys exist only for secondary text and hairlines. */
+/* TheOnePercent1% — black and white, with gold as the only accent.
+   Greys exist only for secondary text and hairlines. Gold is kept for a
+   few deliberate details (see CLAUDE.md), never for large areas. */
 
 :root {
   --ink: #0b0b0b;
@@ -9,6 +10,15 @@
   --muted-on-ink: #a3a3a3;
   --line: #e2e2e2;
   --line-on-ink: #2c2c2c;
+
+  /* Gold: --gold for lines/shapes on white, --gold-bright on black,
+     --gold-text for small gold text on white (4.5:1 contrast). */
+  --gold: #b08d3c;
+  --gold-bright: #d4b062;
+  --gold-text: #8a6a24;
+  /* The gold to use here: switches to the bright one inside .on-ink. */
+  --gold-here: var(--gold);
+  --gold-text-here: var(--gold-text);
 
   --font-sans: 'Archivo Variable', 'Helvetica Neue', Arial, sans-serif;
   --font-serif: 'Instrument Serif', 'Times New Roman', serif;
@@ -119,6 +129,8 @@ ol {
 }
 
 .on-ink {
+  --gold-here: var(--gold-bright);
+  --gold-text-here: var(--gold-bright);
   background: var(--ink);
   color: var(--paper);
 }
@@ -157,11 +169,8 @@ ol {
 
 .label__num {
   font-variant-numeric: tabular-nums;
-  color: var(--ink);
-}
-
-.on-ink .label__num {
-  color: var(--paper);
+  font-weight: 640;
+  color: var(--gold-text-here);
 }
 
 .label::after {
@@ -299,13 +308,17 @@ body {
   z-index: 1;
 }
 
-.ink-thread {
+.ink-thread,
+.ink-gold {
   position: absolute;
   top: 0;
   left: 0;
   z-index: 0;
   overflow: hidden;
   pointer-events: none;
+}
+
+.ink-thread {
   mix-blend-mode: difference;
 }
 
@@ -327,7 +340,7 @@ body {
 /* Section drawings. Every path uses pathLength=1, so a 1/1 dash draws it. */
 .ink-grid path,
 .ink-art path,
-.ink-geo path {
+.ink-gold path {
   fill: none;
   stroke: #fff;
   stroke-linecap: round;
@@ -370,24 +383,38 @@ body {
 }
 
 /* Process: step shapes and the golden-ratio construction. */
+/* Everything on the gold layer is gold (process sits on white, the sun arcs
+   on black, so each gets the gold that reads on its background). */
+.ink-gold path {
+  stroke: var(--gold);
+}
+
 .ink-geo__node {
-  stroke-width: 1.4;
-  stroke-opacity: 0.6;
+  stroke-width: 1.8;
 }
 
 .ink-geo__frame {
   stroke-width: 1;
-  stroke-opacity: 0.28;
+  stroke-opacity: 0.5;
 }
 
 .ink-geo__guide {
   stroke-width: 1;
-  stroke-opacity: 0.18;
+  stroke-opacity: 0.35;
 }
 
 .ink-geo__spiral {
+  stroke-width: 1.8;
+}
+
+.ink-gold .ink-grid__o {
   stroke-width: 1.4;
-  stroke-opacity: 0.55;
+}
+
+.ink-gold .ink-art__arc {
+  stroke: var(--gold-bright);
+  stroke-width: 1.2;
+  stroke-opacity: 0.6;
 }
 
 @media (max-width: 699px) {
@@ -407,7 +434,7 @@ body {
   overflow: visible;
   pointer-events: none;
   fill: none;
-  stroke: currentColor;
+  stroke: var(--gold-here);
   stroke-width: max(2px, 0.035em);
   stroke-linecap: round;
   stroke-linejoin: round;

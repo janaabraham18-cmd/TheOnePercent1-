@@ -47,6 +47,15 @@ Astro (static). `npm run build` runs `astro check` before building.
     circle and diagonal) fills the extra bottom padding of `.process` on desktop (≥900px).
   - **Gold layer:** gold can't go through the difference blend (gold on white inverts to
     blue), so gold drawings live on a second, unblended SVG (`.ink-gold`) at the same z.
+- **Brand film** (`BrandFilm.astro` + `src/scripts/brand-film.js`, in the Services section):
+  a 30 s coded film drawn live in an SVG, four acts: what the 99% fail to do (pen-struck
+  failures, then a blur of SAME) → one dot turns gold and charges → "WE DO THE OPPOSITE." and
+  the four services, whip-panned → "Be a part of the TOP", TOP expands into TheOnePercent1%.
+  It reuses the site's background drawings (blueprint grid, type lines, process shapes, golden
+  spiral, ribbon, sun arcs). Every frame is a pure function of time; it plays only while on
+  screen, has a pause button, uses 4:5 on phones, and shows the final frame (27 s) for reduced
+  motion. Full-screen flashes stay under three per second; keep it that way. The service list
+  in the film is hard-coded in `brand-film.js`, so update it if `services.ts` changes.
 - **Marks on accent words.** h1/h2 accent words use `<InkWord mark="...">` (swoosh, double,
   zigzag, circle, strike) instead of a plain `.serif` span; the pen draws the mark when it
   reaches the word. Negative words get `strike` ("forgettable"). h3s stay plain `.serif`.

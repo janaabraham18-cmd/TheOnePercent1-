@@ -1,0 +1,106 @@
+---
+// The TheOnePercent1% brand film (30 s), drawn live in the browser by
+// src/scripts/brand-film.js. Plays when on screen, pauses when off it, loops.
+// 16:9 on wide screens, 4:5 on phones. With reduced motion it shows the final
+// frame ("Be a part of TheOnePercent1%") and waits for the play button.
+---
+
+<figure class="film" data-film>
+  <div class="film__stage" data-film-stage>
+    <svg
+      class="film__svg"
+      data-film-svg
+      role="img"
+      aria-label="Brand film: 99% of websites blend in. They all look the same, load slowly, break on phones, sound like everyone else, look old in a year and get scrolled past. One dot turns gold. We do the opposite: brand identity, websites, motion graphics, care and updates. Be a part of the TOP: TOP expands into TheOnePercent1%."
+    ></svg>
+    <button class="film__toggle" type="button" data-film-toggle aria-label="Pause animation">
+      <svg class="film__icon film__icon--pause" viewBox="0 0 16 16" aria-hidden="true"><rect x="3.5" y="2.5" width="3" height="11" rx="1" /><rect x="9.5" y="2.5" width="3" height="11" rx="1" /></svg>
+      <svg class="film__icon film__icon--play" viewBox="0 0 16 16" aria-hidden="true"><path d="M4.5 2.8v10.4a.8.8 0 0 0 1.2.7l8.2-5.2a.8.8 0 0 0 0-1.4L5.7 2.1a.8.8 0 0 0-1.2.7Z" /></svg>
+    </button>
+    <span class="film__progress" data-film-progress aria-hidden="true"></span>
+  </div>
+</figure>
+
+<script>
+  import { initFilms } from '../scripts/brand-film.js';
+
+  initFilms();
+</script>
+
+<style>
+  .film {
+    margin: 0;
+  }
+
+  .film__stage {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    background: var(--paper);
+  }
+
+  @media (max-width: 599px) {
+    .film__stage {
+      aspect-ratio: 4 / 5;
+    }
+  }
+
+  .film__svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  .film__toggle {
+    position: absolute;
+    right: 12px;
+    bottom: 14px;
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    border-radius: 50%;
+    background: rgba(11, 11, 11, 0.55);
+    color: #fff;
+    cursor: pointer;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    opacity: 0.75;
+    transition: opacity 0.2s;
+  }
+
+  .film__toggle:hover,
+  .film__toggle:focus-visible {
+    opacity: 1;
+  }
+
+  .film__icon {
+    width: 14px;
+    height: 14px;
+    fill: currentColor;
+  }
+
+  .film__icon--play,
+  :global(.is-paused) .film__icon--pause {
+    display: none;
+  }
+
+  :global(.is-paused) .film__icon--play {
+    display: block;
+  }
+
+  .film__progress {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 3px;
+    background: var(--gold);
+    transform: scaleX(0);
+    transform-origin: left;
+  }
+</style>

@@ -3,6 +3,7 @@ import Base from '../layouts/Base.astro';
 import KineticWordmark from '../components/KineticWordmark.astro';
 import ClientLogo from '../components/ClientLogo.astro';
 import InkWord from '../components/InkWord.astro';
+import BrandFilm from '../components/BrandFilm.astro';
 import { site } from '../data/site';
 import { services, addons, details, process } from '../data/services';
 import { projects } from '../data/work';
@@ -140,6 +141,18 @@ const compare = [
             </ul>
           </article>
         ))}
+      </div>
+
+      <div class="motion-film">
+        <div class="motion-film__head" data-reveal>
+          <p class="label">Motion graphics, in motion</p>
+          <h3 class="motion-film__title">Our own brand, in <span class="serif">motion</span>.</h3>
+          <p class="motion-film__intro">
+            A 30-second brand film, coded to run live in your browser, so it’s sharp on any screen. The same piece cuts
+            to music for social media.
+          </p>
+        </div>
+        <BrandFilm />
       </div>
 
       <div class="addons">
@@ -592,6 +605,42 @@ const compare = [
     .service:last-child:nth-child(odd) .service__list {
       grid-column: 2;
       grid-row: 1 / span 3;
+    }
+  }
+
+  /* Brand film */
+  .motion-film {
+    display: grid;
+    gap: 28px;
+    margin-top: clamp(56px, 7vw, 104px);
+    padding-top: clamp(32px, 4vw, 48px);
+    border-top: 1px solid var(--ink);
+  }
+
+  .motion-film__title {
+    margin-bottom: 14px;
+    font-size: clamp(1.75rem, 1.3rem + 1.8vw, 3rem);
+  }
+
+  .motion-film__intro {
+    max-width: 52ch;
+    color: var(--ink-soft);
+  }
+
+  @media (min-width: 900px) {
+    .motion-film__head {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 0 clamp(40px, 5vw, 96px);
+      align-items: end;
+    }
+
+    .motion-film__head .label {
+      grid-column: 1 / -1;
+    }
+
+    .motion-film__title {
+      margin-bottom: 0;
     }
   }
 

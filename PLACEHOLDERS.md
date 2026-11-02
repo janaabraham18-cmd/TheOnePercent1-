@@ -9,8 +9,10 @@
 - [ ] **WhatsApp / phone** (optional): fill `contact.whatsapp` + `whatsappLabel` in `site.ts` to show it.
 - [ ] **Instagram / LinkedIn** (optional): fill `social` in `site.ts`; empty links are hidden.
 - [ ] **Location** (optional): `contact.location` in `site.ts`; not shown anywhere yet.
-- [ ] **About copy**: the About section on the home page is a draft written in a studio "we" voice. Swap to
-      "I" if you'd rather present as a solo designer, and add your name/photo if you want them shown.
+- [ ] **About**: the manifesto and the four numbers live in `src/data/about.ts`. They're
+      written in a studio "we" voice; check each number is true for how you work (0 templates,
+      7 screen sizes tested, 1 point of contact, 100% hand-built) and swap to "I" if you'd
+      rather present as a solo designer. A photo of you could sit beside the closing line.
 - [ ] **Motion graphics & add-ons**: the Motion graphics service and the five add-ons (1% Audit,
       Website refresh & move, Booking & enquiry systems, Local search setup, Social launch kit)
       in `src/data/services.ts` are drafts. Check the wording and lists match what you'll deliver.

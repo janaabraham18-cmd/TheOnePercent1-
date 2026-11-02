@@ -1,0 +1,172 @@
+---
+// About: a full-width manifesto that fills in word by word as you scroll,
+// four big honest numbers (the 1 in gold) that count up, and a call to
+// action. With reduced motion, or without JS, everything simply shows.
+import InkWord from './InkWord.astro';
+import { manifesto, aboutStats, aboutClose } from '../data/about';
+
+const before = manifesto.before.split(' ');
+const after = manifesto.after.split(' ');
+---
+
+<section class="about" id="about" aria-labelledby="about-title">
+  <div class="wrap">
+    <p class="label"><span class="label__num">06</span> About</p>
+
+    <h2 id="about-title" class="manifesto" data-manifesto>
+      {before.map((w) => <><span class="mw">{w}</span>{' '}</>)}<span class="mw"><InkWord mark="circle">{manifesto.accent}</InkWord></span>{' '}{after.map((w, i) => <><span class="mw">{w}</span>{i < after.length - 1 ? ' ' : ''}</>)}
+    </h2>
+
+    <ul class="stats" data-stats>
+      {aboutStats.map((s) => (
+        <li class:list={['stat', { 'stat--gold': s.gold }]}>
+          <span class="stat__num" data-count={s.value} data-suffix={s.suffix ?? ''}>{s.value}{s.suffix}</span>
+          <span class="stat__label">{s.label}</span>
+        </li>
+      ))}
+    </ul>
+
+    <div class="about__foot">
+      <p>{aboutClose}</p>
+      <a class="btn" href="#contact">Start a project <span class="btn__arrow" aria-hidden="true">→</span></a>
+    </div>
+  </div>
+</section>
+
+<script>
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const head = document.querySelector<HTMLElement>('[data-manifesto]');
+  const stats = document.querySelector<HTMLElement>('[data-stats]');
+
+  if (head && !reduce) {
+    // Words fill from grey to black as the heading scrolls up the screen.
+    const words = [...head.querySelectorAll<HTMLElement>('.mw')];
+    head.classList.add('is-live');
+    let queued = false;
+    const paint = () => {
+      queued = false;
+      const r = head.getBoundingClientRect();
+      const vh = window.innerHeight;
+      const p = Math.min(1, Math.max(0, (vh * 0.85 - r.top) / (r.height + vh * 0.3)));
+      const lit = Math.round(p * words.length);
+      words.forEach((w, i) => w.classList.toggle('is-lit', i < lit));
+    };
+    const onScroll = () => {
+      if (!queued) {
+        queued = true;
+        requestAnimationFrame(paint);
+      }
+    };
+    paint();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+  }
+
+  if (stats && !reduce) {
+    // Numbers count up once, the first time they come into view.
+    const nums = [...stats.querySelectorAll<HTMLElement>('[data-count]')];
+    nums.forEach((n) => (n.textContent = `0${n.dataset.suffix ?? ''}`));
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+        io.disconnect();
+        const start = performance.now();
+        const dur = 1300;
+        const tick = (now: number) => {
+          const k = Math.min(1, (now - start) / dur);
+          const e = 1 - Math.pow(1 - k, 3);
+          nums.forEach((n) => {
+            const target = Number(n.dataset.count);
+            n.textContent = `${Math.round(target * e)}${n.dataset.suffix ?? ''}`;
+          });
+          if (k < 1) requestAnimationFrame(tick);
+        };
+        requestAnimationFrame(tick);
+      },
+      { threshold: 0.4 },
+    );
+    io.observe(stats);
+  }
+</script>
+
+<style>
+  /* Same rhythm as the page's other sections (their padding is scoped to
+     index.astro, so it's repeated here). */
+  .about {
+    padding-block: clamp(80px, 11vw, 168px);
+    border-top: 1px solid var(--line);
+  }
+
+  .manifesto {
+    margin-bottom: clamp(64px, 9vw, 140px);
+    font-size: clamp(2.1rem, 0.9rem + 4.3vw, 5.6rem);
+    font-weight: 680;
+    font-variation-settings: 'wdth' 80;
+    letter-spacing: -0.035em;
+    line-height: 1.02;
+    text-wrap: pretty;
+  }
+
+  .manifesto.is-live .mw {
+    color: #d2d2d0;
+    transition: color 0.35s var(--ease-out);
+  }
+
+  .manifesto.is-live .mw.is-lit {
+    color: var(--ink);
+  }
+
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 40px clamp(24px, 4vw, 64px);
+    margin-bottom: clamp(56px, 7vw, 104px);
+    padding-top: clamp(28px, 3vw, 40px);
+    border-top: 1px solid var(--ink);
+  }
+
+  .stat {
+    display: grid;
+    gap: 14px;
+    align-content: start;
+    min-width: 0;
+  }
+
+  .stat__num {
+    font-size: clamp(4rem, 2.2rem + 6.5vw, 10rem);
+    font-weight: 720;
+    font-variation-settings: 'wdth' 72;
+    letter-spacing: -0.05em;
+    line-height: 0.85;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .stat--gold .stat__num {
+    color: var(--gold);
+  }
+
+  .stat__label {
+    max-width: 26ch;
+    color: var(--ink-soft);
+  }
+
+  @media (min-width: 1000px) {
+    .stats {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+
+  .about__foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px 40px;
+  }
+
+  .about__foot p {
+    max-width: 52ch;
+    font-size: clamp(1.05rem, 0.95rem + 0.4vw, 1.3rem);
+    color: var(--ink-soft);
+  }
+</style>

@@ -67,6 +67,10 @@ Astro (static). `npm run build` runs `astro check` before building.
   stretches out the first time it scrolls into view. Only the hero instance (`hero` prop,
   `[data-kw-hero]`) drives the ink's "O" construction; every instance fires `kw:done` so the
   ink redraws around the final layout.
+- **About** (`AboutSection.astro`, copy in `src/data/about.ts`): a full-width manifesto h2 that
+  fills from grey to black word by word as it scrolls up (accent word "obsess" gets the gold
+  circle mark), four big honest numbers that count up once (the 1 in gold), then a closing
+  line and CTA. Reduced motion / no JS: everything shows at once.
 - **Marks on accent words.** h1/h2 accent words use `<InkWord mark="...">` (swoosh, double,
   zigzag, circle, strike) instead of a plain `.serif` span; the pen draws the mark when it
   reaches the word. Negative words get `strike` ("forgettable"). h3s stay plain `.serif`.

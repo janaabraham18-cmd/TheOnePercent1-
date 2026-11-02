@@ -1,12 +1,13 @@
 ---
 import Base from '../layouts/Base.astro';
+import InkWord from '../components/InkWord.astro';
 ---
 
 <Base title="Page not found">
   <section class="nf">
     <div class="wrap">
       <p class="label">Error 404</p>
-      <h1 class="nf__title">This page is in the other <span class="serif">99%</span>.</h1>
+      <h1 class="nf__title">This page is in the other <InkWord mark="circle">99%</InkWord>.</h1>
       <p class="nf__text">The link may be old, or the page may have moved.</p>
       <a class="btn" href="/">Back to the home page <span class="btn__arrow" aria-hidden="true">→</span></a>
     </div>

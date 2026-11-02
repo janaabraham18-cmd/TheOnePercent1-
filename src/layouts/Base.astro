@@ -48,6 +48,10 @@ const ogImage = image ? new URL(image, Astro.site).href : undefined;
     <Footer />
 
     <script>
+      import '../scripts/ink';
+    </script>
+
+    <script>
       // Fade sections up as they scroll in. Content stays visible if this
       // never runs (no JS, or reduced motion).
       const items = document.querySelectorAll<HTMLElement>('[data-reveal]');

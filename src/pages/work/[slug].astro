@@ -2,6 +2,7 @@
 import { Image, getImage } from 'astro:assets';
 import Base from '../../layouts/Base.astro';
 import ClientLogo from '../../components/ClientLogo.astro';
+import InkWord from '../../components/InkWord.astro';
 import { projects, type Project } from '../../data/work';
 import { hl } from '../../utils/text';
 
@@ -67,14 +68,14 @@ const og = await getImage({ src: p.cover.src, width: 1200, format: 'jpg' });
 
     <section class="cs-section">
       <div class="wrap cs-split">
-        <h2 class="cs-h2">The <span class="serif">brief</span></h2>
+        <h2 class="cs-h2">The <InkWord mark="swoosh">brief</InkWord></h2>
         <p class="cs-brief" data-reveal>{p.brief}</p>
       </div>
     </section>
 
     <section class="cs-section cs-section--line">
       <div class="wrap cs-split">
-        <h2 class="cs-h2">What we <span class="serif">built</span></h2>
+        <h2 class="cs-h2">What we <InkWord mark="zigzag">built</InkWord></h2>
         <ol class="cs-built">
           {p.built.map((b, i) => (
             <li data-reveal>
@@ -106,7 +107,7 @@ const og = await getImage({ src: p.cover.src, width: 1200, format: 'jpg' });
 
     <section class="cs-section cs-details on-ink">
       <div class="wrap cs-split">
-        <h2 class="cs-h2">The one <span class="serif">percent</span></h2>
+        <h2 class="cs-h2">The one <InkWord mark="circle">percent</InkWord></h2>
         <ul class="cs-details__list">
           {p.details.map((d) => (
             <li data-reveal><span class="cs-details__pct" aria-hidden="true">1%</span>{d}</li>

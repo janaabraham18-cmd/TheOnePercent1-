@@ -1,0 +1,35 @@
+---
+// A heading's accent word with a hand-drawn mark (underline, circle, strike).
+// The background pen line (src/scripts/ink.ts) draws the mark as it reaches
+// the word. Without JS, or with reduced motion, the mark is simply shown.
+export type InkMark = 'swoosh' | 'double' | 'zigzag' | 'circle' | 'strike';
+
+interface Props {
+  mark?: InkMark;
+}
+const { mark = 'swoosh' } = Astro.props;
+
+const shapes: Record<InkMark, { vb: string; place: 'under' | 'around' | 'through'; d: string[] }> = {
+  swoosh: { vb: '0 0 100 20', place: 'under', d: ['M1 13 C 22 7, 58 4, 99 9'] },
+  double: { vb: '0 0 100 20', place: 'under', d: ['M2 7 C 30 4, 70 4, 98 6', 'M7 15 C 35 11, 68 11, 94 13'] },
+  zigzag: { vb: '0 0 100 20', place: 'under', d: ['M1 12 Q 13 3 25 11 T 50 11 T 75 10 T 99 7'] },
+  circle: {
+    vb: '0 0 100 40',
+    place: 'around',
+    d: ['M58 3 C 86 2, 99 11, 98 20 C 97 32, 70 38, 46 37 C 18 36, 2 30, 2 20 C 2 10, 20 4, 50 4 C 60 4, 66 5, 72 8'],
+  },
+  strike: {
+    vb: '0 0 100 20',
+    place: 'through',
+    d: ['M1 11 C 20 7, 45 14, 62 9 S 88 7, 99 10', 'M4 14 C 30 8, 70 13, 96 6'],
+  },
+};
+const s = shapes[mark];
+---
+
+<span class="serif ink-word" data-mark={mark}><slot /><svg
+    class={`ink-mark ink-mark--${s.place}`}
+    viewBox={s.vb}
+    preserveAspectRatio="none"
+    aria-hidden="true"
+    focusable="false">{s.d.map((d) => <path d={d} pathLength="1" />)}</svg></span>

@@ -2,6 +2,7 @@
 import Base from '../layouts/Base.astro';
 import KineticWordmark from '../components/KineticWordmark.astro';
 import ClientLogo from '../components/ClientLogo.astro';
+import InkWord from '../components/InkWord.astro';
 import { site } from '../data/site';
 import { services, details, process } from '../data/services';
 import { projects } from '../data/work';
@@ -28,7 +29,7 @@ const compare = [
       <div class="hero__foot">
         <h1 class="hero__title" data-reveal>
           <span class="hero__line">99% of websites blend in.</span>
-          <span class="hero__line">Be the <span class="serif">one percent</span> that stands out.</span>
+          <span class="hero__line">Be the <InkWord mark="swoosh">one percent</InkWord> that stands out.</span>
         </h1>
         <div class="hero__side" data-reveal style="--reveal-delay: 0.1s">
           <p class="hero__lede">
@@ -52,7 +53,7 @@ const compare = [
         <div>
           <p class="label"><span class="label__num">01</span> The other 99%</p>
           <h2 id="ninety-nine-title" class="section-title" data-reveal>
-            Same template. Same stock photos. Same <span class="serif">forgettable</span> result.
+            Same template. Same stock photos. Same <InkWord mark="strike">forgettable</InkWord> result.
           </h2>
         </div>
         <figure class="dots" data-reveal aria-hidden="true">
@@ -83,7 +84,7 @@ const compare = [
     <div class="wrap">
       <header class="section-head">
         <p class="label"><span class="label__num">02</span> Selected work</p>
-        <h2 id="work-title" class="section-title" data-reveal>Work we’re <span class="serif">proud</span> of.</h2>
+        <h2 id="work-title" class="section-title" data-reveal>Work we’re <InkWord mark="circle">proud</InkWord> of.</h2>
       </header>
 
       <ol class="work__list">
@@ -120,7 +121,7 @@ const compare = [
       <header class="section-head section-head--split">
         <div>
           <p class="label"><span class="label__num">03</span> Services</p>
-          <h2 id="services-title" class="section-title" data-reveal>What we <span class="serif">make</span>.</h2>
+          <h2 id="services-title" class="section-title" data-reveal>What we <InkWord mark="double">make</InkWord>.</h2>
         </div>
         <p class="section-intro" data-reveal>
           Every project is quoted on its own scope. Tell us what you need and we’ll come back with a clear, fixed price
@@ -149,7 +150,7 @@ const compare = [
       <header class="section-head">
         <p class="label"><span class="label__num">04</span> The one percent</p>
         <h2 id="details-title" class="section-title" data-reveal>
-          The details most studios <span class="serif">skip</span>.
+          The details most studios <InkWord mark="zigzag">skip</InkWord>.
         </h2>
       </header>
       <ol class="details__grid">
@@ -169,7 +170,7 @@ const compare = [
     <div class="wrap">
       <header class="section-head">
         <p class="label"><span class="label__num">05</span> Process</p>
-        <h2 id="process-title" class="section-title" data-reveal>How a project <span class="serif">runs</span>.</h2>
+        <h2 id="process-title" class="section-title" data-reveal>How a project <InkWord mark="swoosh">runs</InkWord>.</h2>
       </header>
       <ol class="process__steps">
         {process.map((step, i) => (
@@ -189,7 +190,7 @@ const compare = [
       <div>
         <p class="label"><span class="label__num">06</span> About</p>
         <h2 id="about-title" class="section-title" data-reveal>
-          A small studio with <span class="serif">high</span> standards.
+          A small studio with <InkWord mark="circle">high</InkWord> standards.
         </h2>
       </div>
       <div class="about__copy" data-reveal>
@@ -215,7 +216,7 @@ const compare = [
     <div class="wrap">
       <p class="label"><span class="label__num">07</span> Contact</p>
       <h2 id="contact-title" class="contact__title" data-reveal>
-        Let’s build your <span class="serif">one percent</span>.
+        Let’s build your <InkWord mark="double">one percent</InkWord>.
       </h2>
 
       <div class="contact__grid">

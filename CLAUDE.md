@@ -18,6 +18,17 @@ Astro (static). `npm run build` runs `astro check` before building.
   "other 99%" comparison section sits right under the hero.
 - **Client logos are the only colour on the site.** Portfolio items show the client's logo
   (`ClientLogo.astro`) in its own colours on a light panel, not photos.
+- **The pen line** (`src/scripts/ink.ts`): one faint hand-drawn line runs down every page,
+  curling into spirals between sections. Scroll position moves the pen (down draws, up
+  rewinds). It's white with `mix-blend-mode: difference`, so it reads black on white sections
+  and white on black ones; it sits at z 0 under `.wrap` (z 1), so section backgrounds must
+  stay non-positioned and content must stay inside `.wrap`. The route is computed from the
+  live layout: it comes down the right edge beside the hero wordmark, then for each
+  `[data-mark]` word runs down the left gutter beside the heading and turns into the word's
+  bold mark. Rebuilt on resize and when the page height changes.
+- **Marks on accent words.** h1/h2 accent words use `<InkWord mark="...">` (swoosh, double,
+  zigzag, circle, strike) instead of a plain `.serif` span; the pen draws the mark when it
+  reaches the word. Negative words get `strike` ("forgettable"). h3s stay plain `.serif`.
 - **One serif word per heading.** Headings are Archivo (condensed via the `wdth` axis); one
   word per heading is set in Instrument Serif italic with `.serif`, via `hl(text, word)` from
   `src/utils/text.ts` for data-driven headings. Pick the most distinctive word, never a filler.

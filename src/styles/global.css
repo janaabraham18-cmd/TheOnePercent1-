@@ -240,6 +240,30 @@ ol {
   color: var(--ink);
 }
 
+/* Gold: the "Start a project" buttons. */
+.btn--gold {
+  border-color: var(--gold);
+  background: var(--gold);
+  color: var(--ink);
+}
+
+.btn--gold:hover {
+  border-color: var(--ink);
+  background: var(--ink);
+  color: var(--gold-bright);
+}
+
+.on-ink .btn--gold {
+  border-color: var(--gold-bright);
+  background: var(--gold-bright);
+  color: var(--ink);
+}
+
+.on-ink .btn--gold:hover {
+  background: var(--ink);
+  color: var(--gold-bright);
+}
+
 .btn__arrow {
   transition: transform 0.25s var(--ease-out);
 }
@@ -357,6 +381,7 @@ body {
 /* Section drawings. Every path uses pathLength=1, so a 1/1 dash draws it. */
 .ink-grid path,
 .ink-art path,
+.ink-space path,
 .ink-gold path {
   fill: none;
   stroke: #fff;
@@ -397,6 +422,27 @@ body {
 .ink-art path {
   stroke-width: 1.1;
   stroke-opacity: 0.26;
+}
+
+/* Construction drawings in the white space (ink.ts, whiteSpace). */
+.ink-space__shape {
+  stroke-width: 1;
+  stroke-opacity: 0.34;
+}
+
+.ink-space__guide {
+  stroke-width: 1;
+  stroke-opacity: 0.16;
+}
+
+.ink-space text {
+  fill: #fff;
+  fill-opacity: 0.42;
+  font-family: var(--font-sans);
+  font-size: 9px;
+  font-weight: 560;
+  letter-spacing: 0.14em;
+  opacity: 0;
 }
 
 /* Process: step shapes and the golden-ratio construction. */

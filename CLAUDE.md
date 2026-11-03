@@ -22,7 +22,8 @@ numbering uses `pad()` from `src/utils/text.ts`.
   deliberate details only, never large areas: the hand-drawn marks on accent words, the one
   remembered dot in the 100-dot grid, the process geometry, the sun arcs in the work section,
   the construction circle on the hero "O", section numbers (`.label__num`), the "1%" badges,
-  the contact email underline, the nav hover line, and the logo's "1%" block.
+  the contact email underline, the nav hover line, the logo's "1%" block, and the "Start a
+  project" buttons (`.btn--gold`: header, phone menu, hero, About).
 - **The name is the logo.** `Wordmark.astro` renders "TheOnePercent" plus the "1%" as a
   sharp-cornered gold slab (no radius) with a bold black "1" and a half-size "%" raised like an
   exponent (`--gold` on light sections, `--gold-bright` inside `.on-ink`); the hero/footer
@@ -58,6 +59,14 @@ numbering uses `pad()` from `src/utils/text.ts`.
     structure). When the steps stack (narrow screens) each shape sits beside its step number
     instead. A golden-ratio construction (golden rectangle, square divisions, spiral, guide
     circle and diagonal) fills the extra bottom padding of `.process` on desktop (≥900px).
+  - **White space (neutral):** `whiteSpace()` maps each white section (not `.on-ink`, not the
+    hero) onto a grid, marks every cell near text, media, controls, borders, backgrounds and
+    other drawings (`reserved`) as used, then puts a compass-and-ruler construction in the
+    biggest empty squares (up to 4 per section, 2 on phones, kept apart): compass circle,
+    square with diagonals, triangle in its circle, concentric rings, hexagram, square on its
+    midpoints, each with a guide line across the empty run and a small measurement label
+    (desktop only). They draw in as the pen passes. Never hand-place them; they follow the
+    layout at every width.
   - **Gold layer:** gold can't go through the difference blend (gold on white inverts to
     blue), so gold drawings live on a second, unblended SVG (`.ink-gold`) at the same z.
 - **Brand film** (`BrandFilm.astro` + `src/scripts/brand-film.js`, in the Services section):

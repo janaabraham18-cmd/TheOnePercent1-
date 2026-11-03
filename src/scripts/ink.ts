@@ -10,6 +10,9 @@
 //    hero, flowing ribbon lines and sun arcs in the work section, and in the
 //    process section a shape on each timeline step (circle, triangle, square,
 //    hexagon) plus a golden-ratio construction in the empty corner.
+// 3. White space: compass and ruler constructions (circles, squares,
+//    triangles, rings, hexagrams, each with a guide line) placed in the
+//    genuinely empty areas of the white sections, found from the live layout.
 //
 // The neutral layer is drawn white with mix-blend-mode: difference, so it
 // reads black over white sections and white over black ones. Gold can't go
@@ -25,6 +28,8 @@ type Rect = { x: number; y: number; w: number; h: number };
 type Anchor = { paths: SVGPathElement[]; i0: number; i1: number; l0: number; l1: number };
 /** A drawing that animates in over [a, b] of its group's 0–1 progress. */
 type Item = { el: SVGElement; a: number; b: number };
+/** A drawing that animates in as the pen (72% down the screen) passes y0 → y1. */
+type SpaceItem = { el: SVGElement; y0: number; y1: number };
 /** A drawing that animates in as the pen passes length `at`. */
 type StepNode = { paths: SVGElement[]; at: number };
 
@@ -40,6 +45,7 @@ svg.classList.add('ink-thread');
 svg.setAttribute('aria-hidden', 'true');
 const gGrid = make('g', { class: 'ink-grid' }, svg);
 const gArt = make('g', { class: 'ink-art' }, svg);
+const gSpace = make('g', { class: 'ink-space' }, svg);
 const gold = document.createElementNS(NS, 'svg');
 gold.classList.add('ink-gold');
 gold.setAttribute('aria-hidden', 'true');
@@ -117,6 +123,7 @@ let art = { top: 0, span: 1 };
 let geoItems: Item[] = [];
 let geo = { top: 0, span: 1 };
 let nodes: StepNode[] = [];
+let spaceItems: SpaceItem[] = [];
 let introTarget = 0;
 let intro = reduce ? Infinity : 0;
 
@@ -135,6 +142,7 @@ function build() {
   }
   gGrid.replaceChildren();
   gArt.replaceChildren();
+  gSpace.replaceChildren();
   gGeo.replaceChildren();
   gGoldArt.replaceChildren();
   gridItems = [];
@@ -142,6 +150,9 @@ function build() {
   artItems = [];
   geoItems = [];
   nodes = [];
+  spaceItems = [];
+  // Areas other drawings already use, kept clear of white-space drawings.
+  const reserved: Rect[] = [];
 
   const pts: Pt[] = [];
   const P = (x: number, y: number) => pts.push({ x, y });
@@ -466,6 +477,7 @@ function build() {
       const nr = num ? rect(num) : { x: s.x, y: s.y + 28, w: 0, h: 2 * r };
       const c = tl.across ? { x: s.x + r, y: tl.y } : { x: s.x + s.w - r - 2, y: nr.y + nr.h / 2 };
       const at = l0 + (tl.across ? c.x - tl.x : c.y - tl.y) - r;
+      reserved.push({ x: c.x - r, y: c.y - r, w: r * 2, h: r * 2 });
       const paths: SVGElement[] = [stroke(shape(c, r, sides[i % sides.length]), gGeo, 'ink-geo__node')];
       // A small centre point, like a compass mark.
       paths.push(stroke(shape(c, Math.max(1.6, r * 0.09), 0), gGeo, 'ink-geo__node'));
@@ -485,6 +497,7 @@ function build() {
       const right = W - Math.max(40, (W - procWrap.offsetWidth) / 2 + 30);
       let box = { x: right - w, y: R.y + R.h - 24 - h, w, h };
       const outer = { ...box };
+      reserved.push(outer);
 
       const frame = `M ${f(box.x)} ${f(box.y)} H ${f(box.x + w)} V ${f(box.y + h)} H ${f(box.x)} Z`;
       geoItems.push({ el: stroke(frame, gGeo, 'ink-geo__frame'), a: 0, b: 0.3 });
@@ -526,6 +539,232 @@ function build() {
       const c0 = { x: outer.x + outer.h / 2, y: outer.y + outer.h / 2 };
       geoItems.push({ el: stroke(shape(c0, outer.h / 2, 0), gGeo, 'ink-geo__guide'), a: 0.35, b: 0.7 });
     }
+  }
+
+  whiteSpace(W, narrow, reserved);
+}
+
+// ---------- White space: compass and ruler drawings in the empty areas ----------
+// Each white section is mapped onto a coarse grid; every cell near text, an
+// image, a control, a border or a background is marked used (plus anything in
+// `reserved`), then the biggest empty squares get a construction drawing, a
+// few per section, kept apart from each other. Same layout, same drawings.
+function whiteSpace(W: number, narrow: boolean, reserved: Rect[]) {
+  const sy = window.scrollY;
+  const CELL = narrow ? 12 : 20;
+  const pad = narrow ? 14 : 28; // clearance around content
+  const minS = narrow ? 92 : 128; // smallest square worth drawing in
+  const maxS = narrow ? 150 : 300; // biggest drawing
+  const perSection = narrow ? 2 : 4;
+  const sections = $$('main section, main article > header').filter(
+    (s) => !s.closest('.on-ink') && !s.classList.contains('hero') && !s.parentElement?.closest('main section'),
+  );
+  const range = document.createRange();
+  let k = 0; // drawing number down the page, so the designs vary
+
+  for (const sec of sections) {
+    const b = sec.getBoundingClientRect();
+    const top = b.top + sy;
+    const cols = Math.floor(W / CELL);
+    const rows = Math.floor(b.height / CELL);
+    if (rows < 6) continue;
+    const used = new Uint8Array(cols * rows);
+    const block = (x0: number, y0: number, x1: number, y1: number) => {
+      const c0 = Math.max(0, Math.floor(x0 / CELL));
+      const c1 = Math.min(cols - 1, Math.floor(x1 / CELL));
+      const r0 = Math.max(0, Math.floor((y0 - top) / CELL));
+      const r1 = Math.min(rows - 1, Math.floor((y1 - top) / CELL));
+      for (let r = r0; r <= r1; r++) used.fill(1, r * cols + c0, r * cols + c1 + 1);
+    };
+    const blockRect = (r: { left: number; top: number; right: number; bottom: number }, m = pad) =>
+      block(r.left - m, r.top + sy - m, r.right + m, r.bottom + sy + m);
+
+    // Keep off the section's top and bottom edges (the next section may be black).
+    block(0, top, W, top + pad);
+    block(0, top + b.height - pad, W, top + b.height);
+    for (const r of reserved) block(r.x - pad, r.y - pad, r.x + r.w + pad, r.y + r.h + pad);
+
+    // Text, line by line (a short heading leaves room beside it).
+    const walker = document.createTreeWalker(sec, NodeFilter.SHOW_TEXT);
+    for (let n = walker.nextNode(); n; n = walker.nextNode()) {
+      if (!n.textContent?.trim()) continue;
+      range.selectNodeContents(n);
+      for (const r of range.getClientRects()) blockRect(r);
+    }
+    // Everything else that shows: media, controls, borders, backgrounds.
+    for (const el of sec.querySelectorAll('*')) {
+      const tag = el.tagName.toLowerCase();
+      if (el.closest('svg') && tag !== 'svg') continue;
+      const r = el.getBoundingClientRect();
+      if (!r.width && !r.height) continue;
+      if (/^(img|svg|video|canvas|picture|iframe|input|textarea|select|button|hr)$/.test(tag)) {
+        blockRect(r);
+        continue;
+      }
+      const cs = getComputedStyle(el);
+      if (cs.position === 'sticky' && el.parentElement) {
+        // A sticky panel slides down its whole column.
+        const p = el.parentElement.getBoundingClientRect();
+        blockRect({ left: r.left, right: r.right, top: p.top, bottom: p.bottom });
+        continue;
+      }
+      if ((cs.backgroundColor !== 'rgba(0, 0, 0, 0)' && cs.backgroundColor !== 'transparent') || cs.backgroundImage !== 'none') {
+        blockRect(r);
+        continue;
+      }
+      const bw = (side: string) => (cs.getPropertyValue(`border-${side}-style`) === 'none' ? 0 : parseFloat(cs.getPropertyValue(`border-${side}-width`)) || 0);
+      if (bw('top')) blockRect({ left: r.left, right: r.right, top: r.top, bottom: r.top });
+      if (bw('bottom')) blockRect({ left: r.left, right: r.right, top: r.bottom, bottom: r.bottom });
+      if (bw('left')) blockRect({ left: r.left, right: r.left, top: r.top, bottom: r.bottom });
+      if (bw('right')) blockRect({ left: r.right, right: r.right, top: r.top, bottom: r.bottom });
+      if (r.height < 200 && (getComputedStyle(el, '::before').content !== 'none' || getComputedStyle(el, '::after').content !== 'none')) blockRect(r);
+    }
+    // And the page edges.
+    block(0, top, 10, top + b.height);
+    block(W - 10, top, W, top + b.height);
+
+    // The biggest empty squares, one at a time.
+    const dp = new Uint16Array(cols * rows);
+    for (let n = 0; n < perSection; n++) {
+      let best = 0;
+      let bi = 0;
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+          const i = r * cols + c;
+          dp[i] = used[i] ? 0 : r && c ? 1 + Math.min(dp[i - 1], dp[i - cols], dp[i - cols - 1]) : 1;
+          if (dp[i] > best) {
+            best = dp[i];
+            bi = i;
+          }
+        }
+      }
+      const size = best * CELL;
+      if (size < minS) break;
+      const br = Math.floor(bi / cols);
+      const bc = bi % cols;
+      const c = { x: (bc + 1) * CELL - size / 2, y: top + (br + 1) * CELL - size / 2 };
+      const s = Math.min(size, maxS);
+
+      // A guide line through the drawing, as far as the empty space runs:
+      // across for even drawings, down for odd ones.
+      const cc = Math.floor(c.x / CELL);
+      const rr = Math.floor((c.y - top) / CELL);
+      let guide = '';
+      if (k % 2 === 0) {
+        let c0 = cc;
+        let c1 = cc;
+        while (c0 > 0 && !used[rr * cols + c0 - 1]) c0--;
+        while (c1 < cols - 1 && !used[rr * cols + c1 + 1]) c1++;
+        const x0 = c0 * CELL + 6;
+        const x1 = (c1 + 1) * CELL - 6;
+        if (x1 - x0 > s * 1.3) guide = `M ${f(x0)} ${f(c.y)} H ${f(x1)} M ${f(x0)} ${f(c.y - 5)} V ${f(c.y + 5)} M ${f(x1)} ${f(c.y - 5)} V ${f(c.y + 5)}`;
+      } else {
+        let r0 = rr;
+        let r1 = rr;
+        while (r0 > 0 && !used[(r0 - 1) * cols + cc]) r0--;
+        while (r1 < rows - 1 && !used[(r1 + 1) * cols + cc]) r1++;
+        const y0 = top + r0 * CELL + 6;
+        const y1 = top + (r1 + 1) * CELL - 6;
+        if (y1 - y0 > s * 1.3) guide = `M ${f(c.x)} ${f(y0)} V ${f(y1)} M ${f(c.x - 5)} ${f(y0)} H ${f(c.x + 5)} M ${f(c.x - 5)} ${f(y1)} H ${f(c.x + 5)}`;
+      }
+
+      construction(c, s * 0.4, k, guide, narrow);
+      k++;
+      // Keep the next drawing well away from this one.
+      const gap = s * 0.45;
+      block(c.x - s / 2 - gap, c.y - s / 2 - gap, c.x + s / 2 + gap, c.y + s / 2 + gap);
+    }
+  }
+}
+
+// One construction drawing of radius r at c. Six designs, in turn.
+function construction(c: Pt, r: number, k: number, guide: string, narrow: boolean) {
+  const parts: [string, string][] = [];
+  const add = (d: string, cls = 'ink-space__shape') => parts.push([d, cls]);
+  const sq = (h: number) => `M ${f(c.x - h)} ${f(c.y - h)} H ${f(c.x + h)} V ${f(c.y + h)} H ${f(c.x - h)} Z`;
+  const pt = (a: number, rr: number) => ({ x: c.x + Math.cos(a) * rr, y: c.y + Math.sin(a) * rr });
+  const tri = (rot: number) => {
+    const p = [0, 1, 2].map((i) => pt(rot + (i / 3) * Math.PI * 2, r));
+    return `M ${p.map((q) => `${f(q.x)} ${f(q.y)}`).join(' L ')} Z`;
+  };
+  let label = '';
+  let labelAt = { x: c.x + r * 0.08, y: c.y + r + 16 };
+  if (guide) add(guide, 'ink-space__guide');
+
+  switch (k % 6) {
+    case 0: {
+      // Compass circle with a crosshair and centre point.
+      const e = r * 1.25;
+      add(`M ${f(c.x - e)} ${f(c.y)} H ${f(c.x + e)} M ${f(c.x)} ${f(c.y - e)} V ${f(c.y + e)}`, 'ink-space__guide');
+      add(shape(c, r, 0));
+      add(shape(c, 2, 0));
+      label = `Ø ${Math.round(r * 2)}`;
+      break;
+    }
+    case 1: {
+      // Square, its diagonals and the inscribed circle.
+      const h = r * 0.86;
+      add(sq(h));
+      add(`M ${f(c.x - h)} ${f(c.y - h)} L ${f(c.x + h)} ${f(c.y + h)} M ${f(c.x + h)} ${f(c.y - h)} L ${f(c.x - h)} ${f(c.y + h)}`, 'ink-space__guide');
+      add(shape(c, h, 0));
+      label = `${Math.round(h * 2)} × ${Math.round(h * 2)}`;
+      labelAt = { x: c.x - h, y: c.y + h + 16 };
+      break;
+    }
+    case 2: {
+      // Equilateral triangle in its circumcircle, with the angle marked.
+      add(shape(c, r, 0), 'ink-space__guide');
+      add(tri(-Math.PI / 2));
+      const v = pt(-Math.PI / 2 + (2 / 3) * Math.PI * 2, r); // lower left
+      const ar = r * 0.22;
+      const a0 = { x: v.x + ar, y: v.y };
+      const a1 = { x: v.x + ar * Math.cos(-Math.PI / 3), y: v.y + ar * Math.sin(-Math.PI / 3) };
+      add(`M ${f(a0.x)} ${f(a0.y)} A ${f(ar)} ${f(ar)} 0 0 0 ${f(a1.x)} ${f(a1.y)}`);
+      label = '60°';
+      labelAt = { x: v.x + ar + 6, y: v.y - 4 };
+      break;
+    }
+    case 3: {
+      // Concentric rings with a measured radius.
+      [1, 0.66, 0.33].forEach((m, i) => add(shape(c, r * m, 0), i ? 'ink-space__guide' : 'ink-space__shape'));
+      const p = pt(-Math.PI / 6, r);
+      add(`M ${f(c.x)} ${f(c.y)} L ${f(p.x)} ${f(p.y)}`);
+      add(shape(p, 2, 0));
+      label = `r ${Math.round(r)}`;
+      labelAt = { x: p.x + 8, y: p.y - 6 };
+      break;
+    }
+    case 4: {
+      // Hexagon with a hexagram inside.
+      add(shape(c, r, 6));
+      add(tri(-Math.PI / 2), 'ink-space__guide');
+      add(tri(Math.PI / 2), 'ink-space__guide');
+      add(shape(c, 2, 0));
+      label = '6 × 60°';
+      break;
+    }
+    default: {
+      // A square, the square on its midpoints, and the circle between them.
+      const h = r * 0.86;
+      add(sq(h));
+      add(`M ${f(c.x)} ${f(c.y - h)} L ${f(c.x + h)} ${f(c.y)} L ${f(c.x)} ${f(c.y + h)} L ${f(c.x - h)} ${f(c.y)} Z`);
+      add(shape(c, h / Math.SQRT2, 0), 'ink-space__guide');
+      label = '1 : √2';
+      labelAt = { x: c.x - h, y: c.y + h + 16 };
+    }
+  }
+
+  // Drawn as the pen passes: guides first, then the shapes, then the label.
+  const y0 = c.y - r * 1.6;
+  const span = r * 2.4;
+  parts.forEach(([d, cls], i) => {
+    const a = (i / parts.length) * 0.6;
+    spaceItems.push({ el: stroke(d, gSpace, cls), y0: y0 + a * span, y1: y0 + (a + 0.4) * span });
+  });
+  if (label && !narrow) {
+    const t = make('text', { x: f(labelAt.x), y: f(labelAt.y) }, gSpace);
+    t.textContent = label;
+    spaceItems.push({ el: t, y0: y0 + span * 0.85, y1: y0 + span * 1.05 });
   }
 }
 
@@ -569,6 +808,7 @@ function render() {
   drawItems(oItems, reduce ? 1 : kwDoneAt ? (now - kwDoneAt) / 900 : 0);
   drawItems(artItems, reduce ? 1 : (penY - art.top) / art.span);
   drawItems(geoItems, reduce ? 1 : (penY - geo.top) / geo.span);
+  for (const it of spaceItems) setProgress(it.el, reduce ? 1 : clamp01((penY - it.y0) / (it.y1 - it.y0)));
   for (const node of nodes) {
     const t = reduce ? 1 : clamp01((drawn - node.at) / 110);
     const n = node.paths.length;

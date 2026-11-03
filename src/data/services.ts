@@ -88,27 +88,27 @@ export const addons: { title: string; summary: string }[] = [
   {
     title: 'The 1% Audit',
     summary:
-      'A review of the website you already have: speed, how it looks on phones and big screens, copy, search basics and broken links. You get a short list of fixes, most important first.',
+      'A check of your current site, phone to TV, with a short list of fixes, most important first.',
   },
   {
     title: 'Website refresh & move',
     summary:
-      'A redesign of your current site, including moving off WordPress, Wix or Squarespace without losing your place on Google. Old links are sent to the right new pages.',
+      'A redesign or a move off WordPress, Wix or Squarespace, without losing your place on Google.',
   },
   {
     title: 'Booking & enquiry systems',
     summary:
-      'Booking forms, WhatsApp enquiry buttons and payment links that fit how you actually take bookings, sent straight to your inbox or phone.',
+      'Booking forms, WhatsApp buttons and payment links that fit how you actually take bookings.',
   },
   {
     title: 'Local search setup',
     summary:
-      'Your Google Business Profile set up properly, with the right photos, hours and categories, plus an easy way to ask customers for reviews, so you show up in “near me” searches.',
+      'Your Google Business Profile set up properly, so you show up in “near me” searches.',
   },
   {
     title: 'Social launch kit',
     summary:
-      'Profile picture, banner, post and story templates and highlight covers, so your brand looks the same on every platform from day one.',
+      'Profile, banner, post and story templates, so your brand matches on every platform.',
   },
 ];
 

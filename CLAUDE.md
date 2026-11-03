@@ -29,6 +29,8 @@ numbering uses `pad()` from `src/utils/text.ts`.
   exponent (`--gold` on light sections, `--gold-bright` inside `.on-ink`); the hero/footer
   `KineticWordmark.astro`, the brand film's final logo and `public/favicon.svg` match. Always write the name as
   `TheOnePercent1%` (`site.name`) in copy, titles and alt text.
+- **Square corners.** Buttons, tags, form chips, quiz toggles, the film's pause button and the
+  "1%" badges are square-cornered to match the logo's slab. Don't round them; dots stay round.
 - **Hero "TOP" animation.** `KineticWordmark.astro` starts on "TOP" and stretches out into
   "TheOnePercent", then the "1%" block lands (replays on mouse hover). With no JS or with
   reduced motion it shows the full name. Keep its size cap in step with the footer wordmark

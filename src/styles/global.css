@@ -181,7 +181,8 @@ ol {
   opacity: 0.5;
 }
 
-/* Buttons: solid and outline, black on white or inverted on ink. */
+/* Buttons: solid and outline, black on white or inverted on ink. Square-cornered,
+   like the logo's 1% slab. */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -190,7 +191,7 @@ ol {
   min-height: 48px;
   padding: 0 24px;
   border: 1px solid var(--ink);
-  border-radius: 999px;
+  border-radius: 0;
   background: var(--ink);
   color: var(--paper);
   font: inherit;

@@ -161,17 +161,21 @@ import { hl, pad } from '../../utils/text';
     }
   }
 
-  /* Add-ons */
+  /* Add-ons: a compact list, one short line each. */
   .addons {
-    display: grid;
-    gap: 32px clamp(40px, 5vw, 96px);
-    margin-top: clamp(56px, 7vw, 104px);
-    padding-top: clamp(32px, 4vw, 48px);
+    margin-top: clamp(48px, 5vw, 80px);
+    padding-top: clamp(28px, 3vw, 40px);
     border-top: 1px solid var(--ink);
   }
 
+  .addons__head {
+    display: grid;
+    gap: 8px clamp(40px, 5vw, 96px);
+    margin-bottom: clamp(20px, 2.5vw, 32px);
+  }
+
   .addons__title {
-    margin-bottom: 14px;
+    margin: 0;
     font-size: clamp(1.75rem, 1.3rem + 1.8vw, 3rem);
   }
 
@@ -181,35 +185,33 @@ import { hl, pad } from '../../utils/text';
 
   .addon {
     display: grid;
-    gap: 8px 32px;
-    padding: 20px 0 22px;
+    gap: 2px 32px;
+    padding: 14px 0;
     border-top: 1px solid var(--line);
-  }
-
-  .addon:first-child {
-    border-top: 0;
-    padding-top: 0;
   }
 
   .addon__title {
     margin: 0;
-    font-size: clamp(1.2rem, 1.05rem + 0.5vw, 1.5rem);
-    line-height: 1.15;
+    font-size: clamp(1.05rem, 1rem + 0.25vw, 1.2rem);
+    line-height: 1.25;
   }
 
   .addon__summary {
-    max-width: 60ch;
     color: var(--ink-soft);
   }
 
   @media (min-width: 900px) {
-    .addons {
-      grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
-      align-items: start;
+    .addons__head {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      align-items: end;
+    }
+
+    .addons__head .label {
+      grid-column: 1 / -1;
     }
 
     .addon {
-      grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.4fr);
+      grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
       align-items: baseline;
     }
   }

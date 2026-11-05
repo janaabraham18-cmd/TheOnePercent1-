@@ -61,7 +61,7 @@ const og = await getImage({ src: p.cover.src, width: 1200, format: 'jpg' });
     </header>
 
     <div class="cs-cover wrap">
-      <div class="cs-cover__panel">
+      <div class="cs-cover__panel" style={`view-transition-name: logo-${p.slug}`}>
         <ClientLogo id={p.logo} label={`${p.client} logo`} />
       </div>
     </div>
@@ -347,7 +347,7 @@ const og = await getImage({ src: p.cover.src, width: 1200, format: 'jpg' });
   .cs-next__arrow {
     font-size: clamp(2rem, 1.4rem + 3vw, 5rem);
     line-height: 1;
-    transition: transform 0.4s var(--ease-out);
+    transition: transform var(--t-hover) var(--ease-out);
   }
 
   .cs-next__link:hover .cs-next__arrow {

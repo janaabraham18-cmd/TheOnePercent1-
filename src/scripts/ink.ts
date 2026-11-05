@@ -7,12 +7,13 @@
 //    loops the footer "1%") and turns into the bold mark on each heading's
 //    accent word ([data-mark], InkWord.astro). Scrolling moves the pen.
 // 2. Section drawings: a blueprint grid with type construction lines in the
-//    hero, flowing ribbon lines and sun arcs in the work section, and in the
+//    hero, sun arcs in the work section, and in the
 //    process section a shape on each timeline step (circle, triangle, square,
 //    hexagon) plus a golden-ratio construction in the empty corner.
 // 3. White space: compass and ruler constructions (circles, squares,
 //    triangles, rings, hexagrams, each with a guide line) placed in the
-//    genuinely empty areas of the white sections, found from the live layout.
+//    empty margins and gaps of the white sections, outside the content
+//    column, found from the live layout.
 //
 // The neutral layer is drawn white with mix-blend-mode: difference, so it
 // reads black over white sections and white over black ones. Gold can't go
@@ -432,7 +433,7 @@ function build() {
     }
   }
 
-  // ---------- Work: flowing ribbon and sun arcs ----------
+  // ---------- Work: sun arcs ----------
   const work = $('#work');
   if (work) {
     const S = rect(work);
@@ -443,21 +444,6 @@ function build() {
       const r = (90 + i * 46) * scale;
       const el = stroke(`M ${f(sx - r)} ${f(S.y)} A ${f(r)} ${f(r)} 0 0 0 ${f(sx + r)} ${f(S.y)}`, gGoldArt, 'ink-art__arc');
       artItems.push({ el, a: i * 0.04, b: 0.25 + i * 0.04 });
-    }
-    const n = 9;
-    for (let i = 0; i < n; i++) {
-      const k = i - (n - 1) / 2;
-      // Fans open in the middle and gathers at the ends, like a twisting ribbon.
-      const y0 = S.y + S.h * 0.16 + k * 16;
-      const y3 = S.y + S.h * 0.94 + k * 12;
-      const c1 = { x: W * (0.62 + k * 0.02), y: S.y + S.h * 0.0 + k * 58 };
-      const c2 = { x: W * (0.3 - k * 0.02), y: S.y + S.h * 1.05 - k * 46 };
-      const el = stroke(
-        `M ${f(W + 20)} ${f(y0)} C ${f(c1.x)} ${f(c1.y)}, ${f(c2.x)} ${f(c2.y)}, ${f(-20)} ${f(y3)}`,
-        gArt,
-        'ink-art__ribbon',
-      );
-      artItems.push({ el, a: 0.12 + i * 0.03, b: 0.7 + i * 0.03 });
     }
   }
 
@@ -544,18 +530,20 @@ function build() {
   whiteSpace(W, narrow, reserved);
 }
 
-// ---------- White space: compass and ruler drawings in the empty areas ----------
-// Each white section is mapped onto a coarse grid; every cell near text, an
-// image, a control, a border or a background is marked used (plus anything in
-// `reserved`), then the biggest empty squares get a construction drawing, a
-// few per section, kept apart from each other. Same layout, same drawings.
+// ---------- White space: compass and ruler drawings in the margins ----------
+// Each white section is mapped onto a coarse grid. The content column (each
+// .wrap, minus its side padding) is off limits, and so is every cell near
+// text, an image, a control, a border or a background, plus anything in
+// `reserved`. The biggest empty squares left (the side margins on wide
+// screens, the gaps between sections) get a construction drawing, at most two
+// per section, kept apart. Same layout, same drawings.
 function whiteSpace(W: number, narrow: boolean, reserved: Rect[]) {
   const sy = window.scrollY;
   const CELL = narrow ? 12 : 20;
   const pad = narrow ? 14 : 28; // clearance around content
-  const minS = narrow ? 92 : 128; // smallest square worth drawing in
-  const maxS = narrow ? 150 : 300; // biggest drawing
-  const perSection = narrow ? 2 : 4;
+  const minS = narrow ? 92 : 112; // smallest square worth drawing in
+  const maxS = narrow ? 150 : 280; // biggest drawing
+  const perSection = narrow ? 1 : 2;
   const sections = $$('main section, main article > header').filter(
     (s) => !s.closest('.on-ink') && !s.classList.contains('hero') && !s.parentElement?.closest('main section'),
   );
@@ -583,6 +571,12 @@ function whiteSpace(W: number, narrow: boolean, reserved: Rect[]) {
     block(0, top, W, top + pad);
     block(0, top + b.height - pad, W, top + b.height);
     for (const r of reserved) block(r.x - pad, r.y - pad, r.x + r.w + pad, r.y + r.h + pad);
+    // Never inside the content column: drawings stay in the margins.
+    for (const wrap of sec.querySelectorAll<HTMLElement>('.wrap')) {
+      const wr = wrap.getBoundingClientRect();
+      const ws = getComputedStyle(wrap);
+      block(wr.left + parseFloat(ws.paddingLeft) - pad, wr.top + sy, wr.right - parseFloat(ws.paddingRight) + pad, wr.bottom + sy);
+    }
 
     // Text, line by line (a short heading leaves room beside it).
     const walker = document.createTreeWalker(sec, NodeFilter.SHOW_TEXT);

@@ -52,23 +52,31 @@ const ogImage = image ? new URL(image, Astro.site).href : undefined;
     </script>
 
     <script>
-      // Fade sections up as they scroll in. Content stays visible if this
-      // never runs (no JS, or reduced motion).
-      const items = document.querySelectorAll<HTMLElement>('[data-reveal]');
+      // Fade sections up as they scroll in, and raise h1/h2 headings line by
+      // line (src/scripts/lines.ts). Content stays visible if this never runs
+      // (no JS, or reduced motion).
+      import { revealLines } from '../scripts/lines';
+
       if ('IntersectionObserver' in window && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        const heads = [...document.querySelectorAll<HTMLElement>('main h1, main h2')].filter((h) => !h.hasAttribute('data-manifesto'));
+        for (const h of heads) {
+          h.removeAttribute('data-reveal');
+          h.setAttribute('data-lines', '');
+        }
         document.documentElement.classList.add('reveal-ready');
         const io = new IntersectionObserver(
           (entries) => {
             for (const entry of entries) {
-              if (entry.isIntersecting) {
-                entry.target.classList.add('is-in');
-                io.unobserve(entry.target);
-              }
+              if (!entry.isIntersecting) continue;
+              const el = entry.target as HTMLElement;
+              io.unobserve(el);
+              if (el.hasAttribute('data-lines')) revealLines(el);
+              else el.classList.add('is-in');
             }
           },
           { rootMargin: '0px 0px -8% 0px', threshold: 0.08 },
         );
-        items.forEach((el) => io.observe(el));
+        document.querySelectorAll<HTMLElement>('[data-reveal], [data-lines]').forEach((el) => io.observe(el));
       }
     </script>
   </body>

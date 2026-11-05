@@ -55,22 +55,43 @@ numbering uses `pad()` from `src/utils/text.ts`.
   - **Hero blueprint:** 12-column guides plus cap-height / x-height / baseline lines measured
     from the real wordmark, drawn on load; a construction circle + square on the "O" once TOP
     finishes stretching (`kw:done` event from `KineticWordmark.astro`).
-  - **Work (black):** a flowing ribbon of parallel lines and sun arcs, drawn as you scroll.
+  - **Work (black):** gold sun arcs, drawn as you scroll. (The ribbon of parallel lines was
+    removed to calm the page down; don't add it back.)
   - **Process (geometry, gold):** the pen becomes a straight timeline through a big shape on
     each step, drawn as the pen passes: circle, triangle, square, hexagon (a project gaining
     structure). When the steps stack (narrow screens) each shape sits beside its step number
     instead. A golden-ratio construction (golden rectangle, square divisions, spiral, guide
     circle and diagonal) fills the extra bottom padding of `.process` on desktop (≥900px).
   - **White space (neutral):** `whiteSpace()` maps each white section (not `.on-ink`, not the
-    hero) onto a grid, marks every cell near text, media, controls, borders, backgrounds and
-    other drawings (`reserved`) as used, then puts a compass-and-ruler construction in the
-    biggest empty squares (up to 4 per section, 2 on phones, kept apart): compass circle,
+    hero) onto a grid, marks the content column (each `.wrap` minus its side padding) and every
+    cell near text, media, controls, borders, backgrounds and other drawings (`reserved`) as
+    used, then puts a compass-and-ruler construction in the biggest empty squares left, i.e.
+    only the side margins and the gaps between sections (at most 2 per section, 1 on phones,
+    kept apart; often none on phones and laptops): compass circle,
     square with diagonals, triangle in its circle, concentric rings, hexagram, square on its
     midpoints, each with a guide line across the empty run and a small measurement label
     (desktop only). They draw in as the pen passes. Never hand-place them; they follow the
     layout at every width.
   - **Gold layer:** gold can't go through the difference blend (gold on white inverts to
     blue), so gold drawings live on a second, unblended SVG (`.ink-gold`) at the same z.
+- **Restraint.** Premium here means fewer, calmer things. The signature is the pen line, the
+  hero blueprint and the accent-word marks; each other section gets at most one drawing that
+  means something (Work's sun arcs, Process's shapes and golden spiral). Don't add decoration
+  inside the content column.
+- **One motion style.** Every transition uses `--ease-out` (`cubic-bezier(0.22, 1, 0.36, 1)`)
+  at `--t-hover` (0.45s: hovers, toggles) or `--t-reveal` (1.1s: things arriving), all in
+  `global.css`. No bouncy/overshoot curves. The only exception is KineticWordmark's TOP stretch.
+- **Headings rise line by line.** Every `main h1` / `main h2` (except the About manifesto,
+  which has its own fill) is split into its real lines by `src/scripts/lines.ts` when it
+  scrolls in; each line slides up out of a `clip-path` mask (so the layout never moves),
+  staggered 0.09s, then the heading is put back exactly as it was (element children like
+  InkWord are moved, not copied, so the ink layer's references survive). The reveal observer
+  in `Base.astro` drives it; no JS or reduced motion shows headings as normal.
+- **Page transitions.** Cross-document View Transitions (`@view-transition` in global.css):
+  a 0.6s cross-fade, the header held still (`view-transition-name: site-header`), and each
+  project's logo panel carried between the home page and its case study
+  (`view-transition-name: logo-<slug>` on `.work-item__media` and `.cs-cover__panel`; names
+  must stay unique per page). Browsers without support just navigate normally.
 - **Brand film** (`BrandFilm.astro` + `src/scripts/brand-film.js`, in the Services section):
   a 30 s coded film drawn live in an SVG, four acts: what the 99% fail to do (pen-struck
   failures, then a blur of SAME) → one dot turns gold and charges → "WE DO THE OPPOSITE." and

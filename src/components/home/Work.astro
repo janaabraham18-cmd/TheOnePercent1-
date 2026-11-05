@@ -16,7 +16,7 @@ import { hl, pad } from '../../utils/text';
     <ol class="work__list">
       {projects.map((p, i) => (
         <li class="work-item" data-reveal>
-          <a class="work-item__media" href={`/work/${p.slug}`} tabindex="-1" aria-hidden="true">
+          <a class="work-item__media" href={`/work/${p.slug}`} tabindex="-1" aria-hidden="true" style={`view-transition-name: logo-${p.slug}`}>
             <ClientLogo id={p.logo} label={`${p.client} logo`} />
           </a>
           <div class="work-item__body">
@@ -64,7 +64,7 @@ import { hl, pad } from '../../utils/text';
   }
 
   .work-item__media > :global(*) {
-    transition: transform 0.9s var(--ease-out);
+    transition: transform var(--t-reveal) var(--ease-out);
   }
 
   @media (hover: hover) {
